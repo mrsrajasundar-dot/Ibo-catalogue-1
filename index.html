@@ -20,6 +20,7 @@
         .btn-clear { padding: 12px 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn-primary { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; }
         .btn-primary:active { background: #0369a1; }
+        .btn-search-trigger { padding: 12px 15px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
         .btn-success { width: 100%; padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-success:active { background: #15803d; }
         .result-section { margin-top: 15px; background: #f0f9ff; border: 1px dashed #0284c7; border-radius: 10px; padding: 15px; }
@@ -60,7 +61,7 @@
         </div>
         
         <div id="filterFieldsForm" style="display:none;">
-            <!-- Dropdown Filter Section -->
+            <!-- Dropdown Filters -->
             <div class="form-group">
                 <label>Category</label>
                 <div class="filter-row">
@@ -71,34 +72,36 @@
             <div class="form-group">
                 <label>Class</label>
                 <div class="filter-row">
-                    <select id="class" onchange="handleDropdownChange('cls')"><option value="">-- All Classes --</option></select>
+                    <select id="class" onchange="changeDropdownManual('cls')"><option value="">-- All Classes --</option></select>
                     <button class="btn-clear" onclick="clearSingleFilter('class')">❌ Clear</button>
                 </div>
             </div>
             <div class="form-group">
                 <label>Sub Class</label>
                 <div class="filter-row">
-                    <select id="subclass" onchange="handleDropdownChange('sub')"><option value="">-- All Sub Classes --</option></select>
+                    <select id="subclass" onchange="changeDropdownManual('sub')"><option value="">-- All Sub Classes --</option></select>
                     <button class="btn-clear" onclick="clearSingleFilter('subclass')">❌ Clear</button>
                 </div>
             </div>
             <div class="form-group">
                 <label>Brand</label>
                 <div class="filter-row">
-                    <select id="brand" onchange="handleDropdownChange('brand')"><option value="">-- All Brands --</option></select>
+                    <select id="brand" onchange="changeDropdownManual('brand')"><option value="">-- All Brands --</option></select>
                     <button class="btn-clear" onclick="clearSingleFilter('brand')">❌ Clear</button>
                 </div>
             </div>
 
-            <!-- Anti-Lag Process Trigger -->
             <button class="btn-primary" onclick="triggerFilterSubmit()">🔍 Show Results</button>
             
-            <!-- RESULTS VIEW WITH SEARCH BOX ON TOP -->
+            <!-- RESULTS REGION -->
             <div class="result-section" id="resultSection" style="display:none;">
-                <!-- MASTER SEARCH BOX PLACED EXACTLY ABOVE RESULTS -->
+                <!-- DYNAMIC KEYWORD ENTRY WITH EXPLICIT SEARCH BUTTON -->
                 <div class="form-group" style="margin-bottom:12px;">
-                    <label style="color:#0284c7; font-size:13px;">🎯 Filter current results (Offer ID / Name)</label>
-                    <input type="text" id="masterSearchInput" placeholder="Type keywords to filter list below..." oninput="handleMasterSearch()">
+                    <label style="color:#0284c7; font-size:14px; font-weight:bold;">🎯 Filter Current List (Offer ID / Name)</label>
+                    <div class="filter-row" style="margin-top:5px;">
+                        <input type="text" id="masterSearchInput" placeholder="Type keyword and press search icon...">
+                        <button class="btn-search-trigger" onclick="handleMasterSearch()">🔍</button>
+                    </div>
                 </div>
 
                 <div style="font-weight:bold; color:#0369a1; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
@@ -219,6 +222,10 @@ function handleDropdownChange(triggeredFilter) {
     if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))]);
 }
 
+function changeDropdownManual(id) {
+    handleDropdownChange(id);
+}
+
 function clearSingleFilter(id) {
     document.getElementById(id).value = "";
     handleDropdownChange('');
@@ -251,6 +258,7 @@ function handleMasterSearch() {
         document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${activeFilteredMatches.length}`;
         return;
     }
+    // Execution happens securely only on explicit icon submit click to prevent tracking lags
     let textFiltered = activeFilteredMatches.filter(item => item.id.toLowerCase().includes(query) || item.name.toLowerCase().includes(query));
     document.getElementById("resultCountLabel").innerText = `🎯 Filtered Matches: ${textFiltered.length}`;
     renderCatalogCards(textFiltered.slice(0, 100));
@@ -350,6 +358,7 @@ function exportFolderToCSV() {
     document.body.removeChild(link);
 }
 
+// Global Tab Manager
 function switchTab(tabId, btn) {
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
