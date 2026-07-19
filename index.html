@@ -15,12 +15,13 @@
         .tab-content.active { display: block; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #374151; font-size: 14px; }
-        .filter-row { display: flex; gap: 8px; align-items: center; }
-        select, input { flex: 1; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; }
-        .btn-clear { padding: 12px 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        select, input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; }
+        .btn-clear-all { width: 100%; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; text-transform: uppercase; }
+        .btn-clear-all:active { background: #dc2626; }
         .btn-primary { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; }
         .btn-primary:active { background: #0369a1; }
-        .btn-search-trigger { padding: 12px 15px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .filter-row-search { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
+        .btn-search-trigger { padding: 12px 18px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
         .btn-success { width: 100%; padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-success:active { background: #15803d; }
         .result-section { margin-top: 15px; background: #f0f9ff; border: 1px dashed #0284c7; border-radius: 10px; padding: 15px; }
@@ -37,9 +38,10 @@
         .qty-input { width: 70px; padding: 5px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; }
         .btn-add-cart { padding: 6px 12px; background: #16a34a; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
-        .contact-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 20px; text-align: center; margin-top: 10px; }
-        .contact-name { font-size: 20px; font-weight: bold; color: #16a34a; margin: 5px 0; }
-        .contact-phone { font-size: 18px; font-weight: bold; color: #1e293b; text-decoration: none; }
+        .contact-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px; }
+        .contact-title { font-size: 15px; font-weight: bold; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        .contact-name { font-size: 24px; font-weight: 800; color: #0284c7; margin: 10px 0 5px 0; }
+        .contact-phone { font-size: 20px; font-weight: bold; color: #1e293b; text-decoration: none; display: inline-block; margin-top: 5px; background: #e0f2fe; padding: 8px 15px; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -61,45 +63,36 @@
         </div>
         
         <div id="filterFieldsForm" style="display:none;">
+            <!-- ONE SINGLE MASTER RESET BUTTON FOR ALL FILTERS -->
+            <button class="btn-clear-all" onclick="resetEverythingMaster()">🔄 Reset All Filters & Fields</button>
+
             <!-- Dropdown Filters -->
             <div class="form-group">
                 <label>Category</label>
-                <div class="filter-row">
-                    <select id="category" onchange="handleDropdownChange('cat')"><option value="">-- All Categories --</option></select>
-                    <button class="btn-clear" onclick="clearSingleFilter('category')">❌ Clear</button>
-                </div>
+                <select id="category" onchange="handleDropdownChange()"><option value="">-- All Categories --</option></select>
             </div>
             <div class="form-group">
                 <label>Class</label>
-                <div class="filter-row">
-                    <select id="class" onchange="changeDropdownManual('cls')"><option value="">-- All Classes --</option></select>
-                    <button class="btn-clear" onclick="clearSingleFilter('class')">❌ Clear</button>
-                </div>
+                <select id="class" onchange="handleDropdownChange()"><option value="">-- All Classes --</option></select>
             </div>
             <div class="form-group">
                 <label>Sub Class</label>
-                <div class="filter-row">
-                    <select id="subclass" onchange="changeDropdownManual('sub')"><option value="">-- All Sub Classes --</option></select>
-                    <button class="btn-clear" onclick="clearSingleFilter('subclass')">❌ Clear</button>
-                </div>
+                <select id="subclass" onchange="handleDropdownChange()"><option value="">-- All Sub Classes --</option></select>
             </div>
             <div class="form-group">
                 <label>Brand</label>
-                <div class="filter-row">
-                    <select id="brand" onchange="changeDropdownManual('brand')"><option value="">-- All Brands --</option></select>
-                    <button class="btn-clear" onclick="clearSingleFilter('brand')">❌ Clear</button>
-                </div>
+                <select id="brand" onchange="handleDropdownChange()"><option value="">-- All Brands --</option></select>
             </div>
 
             <button class="btn-primary" onclick="triggerFilterSubmit()">🔍 Show Results</button>
             
-            <!-- RESULTS REGION -->
+            <!-- RESULTS VIEW -->
             <div class="result-section" id="resultSection" style="display:none;">
-                <!-- DYNAMIC KEYWORD ENTRY WITH EXPLICIT SEARCH BUTTON -->
+                <!-- ADVANCED SMART FILTER BOX (TOP OF RESULTS) -->
                 <div class="form-group" style="margin-bottom:12px;">
-                    <label style="color:#0284c7; font-size:14px; font-weight:bold;">🎯 Filter Current List (Offer ID / Name)</label>
-                    <div class="filter-row" style="margin-top:5px;">
-                        <input type="text" id="masterSearchInput" placeholder="Type keyword and press search icon...">
+                    <label style="color:#0284c7; font-size:14px; font-weight:bold;">🎯 Smart Search Current List (e.g., 90m, FR, 1.5, Name)</label>
+                    <div class="filter-row-search">
+                        <input type="text" id="masterSearchInput" placeholder="Type words (split by space) and hit search...">
                         <button class="btn-search-trigger" onclick="handleMasterSearch()">🔍</button>
                     </div>
                 </div>
@@ -126,7 +119,7 @@
     <!-- TAB 3: CONTACT INFORMATION -->
     <div id="info-tab" class="tab-content">
         <div class="contact-box">
-            <div style="font-size:14px; color:#475569; font-weight:600;">Need changes pannanum na please contact</div>
+            <div class="contact-title">Any Support Contact</div>
             <div class="contact-name">Raja</div>
             <a href="tel:+918072613468" class="contact-phone">📞 +91 8072613468</a>
         </div>
@@ -148,7 +141,7 @@ function loadCentralCSV() {
     })
     .then(text => parseCSVTextData(text))
     .catch(error => {
-        document.getElementById("totalItemsCounter").innerHTML = `🚨 Error: IBO STOCK-1.csv missing!`;
+        document.getElementById("totalItemsCounter").innerHTML = `🚨 Error: IBO STOCK-1.csv missing in your repository!`;
     });
 }
 
@@ -204,7 +197,7 @@ function populateSingleDropdown(id, list) {
     });
 }
 
-function handleDropdownChange(triggeredFilter) {
+function handleDropdownChange() {
     let catVal = document.getElementById("category").value;
     let clsVal = document.getElementById("class").value;
     let subVal = document.getElementById("subclass").value;
@@ -222,14 +215,20 @@ function handleDropdownChange(triggeredFilter) {
     if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))]);
 }
 
-function changeDropdownManual(id) {
-    handleDropdownChange(id);
-}
-
-function clearSingleFilter(id) {
-    document.getElementById(id).value = "";
-    handleDropdownChange('');
-    showToast("Filter cleared");
+// SINGLE ORE BUTTON METHOD TO ERASE ALL TRACES
+function resetEverythingMaster() {
+    document.getElementById("category").value = "";
+    document.getElementById("class").value = "";
+    document.getElementById("subclass").value = "";
+    document.getElementById("brand").value = "";
+    document.getElementById("masterSearchInput").value = "";
+    
+    populateAllDropdownsInitial();
+    activeFilteredMatches = [];
+    
+    document.getElementById("resultSection").style.display = "none";
+    document.getElementById("multipleResultsContainer").innerHTML = "";
+    showToast("Everything Reset Cleanly! 🔄");
 }
 
 function triggerFilterSubmit() {
@@ -251,15 +250,28 @@ function triggerFilterSubmit() {
     document.getElementById("resultSection").style.display = "block";
 }
 
+// ADVANCED SEGMENTED MULTI-KEYWORD MATCHER (Hangs-Proof Protection)
 function handleMasterSearch() {
-    let query = document.getElementById("masterSearchInput").value.toLowerCase().trim();
-    if(!query) {
-        renderCatalogCards(activeFilteredMatches.slice(0, 100));
-        document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${activeFilteredMatches.length}`;
+    let rawQuery = document.getElementById("masterSearchInput").value.toLowerCase().trim();
+    
+    // Base targeting relies on dropdown selection pool. If empty, searches global catalog base
+    let currentPool = activeFilteredMatches.length > 0 ? activeFilteredMatches : catalogData;
+    
+    if(!rawQuery) {
+        renderCatalogCards(currentPool.slice(0, 100));
+        document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${currentPool.length}`;
         return;
     }
-    // Execution happens securely only on explicit icon submit click to prevent tracking lags
-    let textFiltered = activeFilteredMatches.filter(item => item.id.toLowerCase().includes(query) || item.name.toLowerCase().includes(query));
+    
+    // Splits input by space to support parallel segmented lookups like "90m" "FR" "1.5"
+    let searchTerms = rawQuery.split(/\s+/);
+    
+    let textFiltered = currentPool.filter(item => {
+        let targetText = (item.id + " " + item.name).toLowerCase();
+        // Item must contain EVERY input term entered in the input row array
+        return searchTerms.every(term => targetText.includes(term));
+    });
+    
     document.getElementById("resultCountLabel").innerText = `🎯 Filtered Matches: ${textFiltered.length}`;
     renderCatalogCards(textFiltered.slice(0, 100));
 }
@@ -289,7 +301,7 @@ function renderCatalogCards(dataList) {
             `;
         });
     } else {
-        container.innerHTML = "<div style='text-align:center; font-size:13px; color:#64748b; padding:10px;'>No results matched.</div>";
+        container.innerHTML = "<div style='text-align:center; font-size:13px; color:#64748b; padding:10px;'>No matching products found. Try modifying keywords!</div>";
     }
 }
 
@@ -358,7 +370,6 @@ function exportFolderToCSV() {
     document.body.removeChild(link);
 }
 
-// Global Tab Manager
 function switchTab(tabId, btn) {
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
