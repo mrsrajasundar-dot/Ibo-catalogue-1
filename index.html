@@ -6,73 +6,93 @@
     <title>IBO Smart Catalog</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
-        .splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #b91c1c; color: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 24px; font-weight: 800; opacity: 1; transition: opacity 0.4s; text-align: center; padding: 20px; pointer-events: none; }
-        .app-header { background: #b91c1c; color: #ffffff; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #a21a1a; }
-        .app-header-title { font-size: 22px; font-weight: 800; color: #ffffff; }
-        .tab-bar { display: flex; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+        .app-header { background: #b91c1c; color: #ffffff; padding: 20px; text-align: center; }
+        .tab-bar { display: flex; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
         .tab-btn { flex: 1; padding: 14px 10px; border: none; background: none; font-weight: 600; cursor: pointer; color: #64748b; font-size: 13px; }
         .tab-btn.active { background: #ffffff; color: #334155; border-bottom: 3px solid #334155; }
         .tab-content { padding: 20px; display: none; }
         .tab-content.active { display: block; }
         .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #475569; font-size: 14px; }
-        select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
-        .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; background: #16a34a; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
-        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 99999; display: none; }
-        .modal-content { background: #fff; width: 90%; max-width: 400px; padding: 20px; border-radius: 12px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #475569; }
+        select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+        .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<!-- ... (Keep your existing HTML structure until Admin Tab) ... -->
 <div class="app-container">
-    <div class="app-header"><div class="app-header-title">IBO Smart Catalog</div></div>
+    <div class="app-header"><h3>IBO Smart Catalog</h3></div>
     <div class="tab-bar">
         <button class="tab-btn active" onclick="switchTab('search-tab', this)">🔍 Search</button>
         <button class="tab-btn" onclick="switchTab('folder-tab', this)">📂 Folder</button>
         <button class="tab-btn" onclick="switchTab('admin-tab', this)">⚙️ Admin</button>
+        <button class="tab-btn" onclick="switchTab('info-tab', this)">📞 Contact</button>
+    </div>
+
+    <div id="search-tab" class="tab-content active">
+        <!-- Unga Search UI here -->
+        <div class="form-group"><label>Category</label><select id="category"><option value="">-- All --</option></select></div>
+        <!-- ... -->
+    </div>
+
+    <div id="folder-tab" class="tab-content">
+        <h3>Saved Folders</h3>
+        <div id="multiFolderContainer"></div>
     </div>
 
     <div id="admin-tab" class="tab-content">
         <div id="adminLockScreen">
-            <h3 style="margin-top:0;">🔒 Admin Authentication</h3>
-            <div class="form-group"><input type="password" id="adminPasswordInput" placeholder="Enter Password..."></div>
-            <button class="btn-primary" onclick="checkAdminPassword()">Verify & Unlock</button>
+            <h3>🔒 Admin</h3>
+            <input type="password" id="adminPasswordInput" placeholder="Password...">
+            <button class="btn-primary" onclick="checkAdminPassword()">Unlock</button>
         </div>
         <div id="adminContentPanel" style="display:none;">
-            <div class="data-counter" id="totalItemsCounter">Stock Ready</div>
-            <h4>➕ Add Product</h4>
-            <select id="aCat" onchange="filterAdminClass()"><option value="">Category</option></select>
-            <select id="aCls" onchange="filterAdminSub()"><option value="">Class</option></select>
-            <select id="aSub" onchange="filterAdminBrand()"><option value="">Sub Class</option></select>
-            <select id="aBrand"><option value="">Brand</option></select>
-            <input type="text" id="addId" placeholder="Offer ID" style="margin-top:10px;">
-            <input type="text" id="addName" placeholder="Product Name" style="margin-top:10px;">
-            <button class="btn-primary" onclick="addSingleProduct()">Save Product</button>
+            <h4>Add Single Product</h4>
+            <div class="form-group"><label>Category</label><select id="aCat" onchange="filterAdminClass()"><option value="">-- Select --</option></select></div>
+            <div class="form-group"><label>Class</label><select id="aCls" onchange="filterAdminSub()"><option value="">-- Select --</option></select></div>
+            <div class="form-group"><label>Sub Class</label><select id="aSub" onchange="filterAdminBrand()"><option value="">-- Select --</option></select></div>
+            <div class="form-group"><label>Brand</label><select id="aBrand"><option value="">-- Select --</option></select></div>
+            <input type="text" id="addId" placeholder="Offer ID" style="margin-bottom:10px;">
+            <input type="text" id="addName" placeholder="Product Name" style="margin-bottom:10px;">
+            <button class="btn-primary" style="background:#16a34a;" onclick="addSingleProduct()">Save Product</button>
+            <hr>
+            <input type="file" id="csvFileInput" accept=".csv">
+            <button class="btn-primary" style="background:#ef4444;" onclick="processBulkUpload(true)">💥 Bulk Replace (Full Erase)</button>
         </div>
     </div>
+
+    <div id="info-tab" class="tab-content"><h3>Contact: Raja</h3></div>
 </div>
 
 <script>
-// --- ADMIN DYNAMIC LOGIC ---
-function initAdminAddForm() {
+let catalogData = [];
+
+// Admin logic
+function checkAdminPassword() {
+    if(document.getElementById("adminPasswordInput").value === "raja123") {
+        document.getElementById("adminLockScreen").style.display = "none";
+        document.getElementById("adminContentPanel").style.display = "block";
+        initAdminDropdowns();
+    } else { alert("Wrong Password!"); }
+}
+
+function initAdminDropdowns() {
     let cats = [...new Set(catalogData.map(i => i.cat))];
-    populateDropdown("aCat", cats, "Category");
+    populateDropdown("aCat", cats);
 }
 
 function filterAdminClass() {
     let cat = document.getElementById("aCat").value;
     let cls = [...new Set(catalogData.filter(i => i.cat === cat).map(i => i.cls))];
-    populateDropdown("aCls", cls, "Class");
+    populateDropdown("aCls", cls);
 }
 
 function filterAdminSub() {
     let cat = document.getElementById("aCat").value;
     let cls = document.getElementById("aCls").value;
     let subs = [...new Set(catalogData.filter(i => i.cat === cat && i.cls === cls).map(i => i.sub))];
-    populateDropdown("aSub", subs, "Sub Class");
+    populateDropdown("aSub", subs);
 }
 
 function filterAdminBrand() {
@@ -80,20 +100,17 @@ function filterAdminBrand() {
     let cls = document.getElementById("aCls").value;
     let sub = document.getElementById("aSub").value;
     let brands = [...new Set(catalogData.filter(i => i.cat === cat && i.cls === cls && i.sub === sub).map(i => i.brand))];
-    populateDropdown("aBrand", brands, "Brand");
+    populateDropdown("aBrand", brands);
 }
 
-function populateDropdown(id, list, label) {
-    let s = document.getElementById(id);
-    s.innerHTML = `<option value="">${label}</option>`;
-    list.filter(Boolean).sort().forEach(v => {
-        let opt = document.createElement("option"); opt.value = v; opt.innerText = v;
-        s.appendChild(opt);
-    });
+function populateDropdown(id, list) {
+    let el = document.getElementById(id);
+    el.innerHTML = '<option value="">-- Select --</option>';
+    list.forEach(v => { el.innerHTML += `<option value="${v}">${v}</option>`; });
 }
 
 function addSingleProduct() {
-    let newProd = {
+    let p = {
         id: document.getElementById("addId").value,
         cat: document.getElementById("aCat").value,
         cls: document.getElementById("aCls").value,
@@ -101,19 +118,27 @@ function addSingleProduct() {
         brand: document.getElementById("aBrand").value,
         name: document.getElementById("addName").value
     };
-    catalogData.push(newProd);
-    alert("Saved Successfully!");
+    catalogData.push(p);
+    alert("Product Added!");
 }
 
-function checkAdminPassword() {
-    if(document.getElementById("adminPasswordInput").value === "raja123") {
-        document.getElementById("adminLockScreen").style.display = "none";
-        document.getElementById("adminContentPanel").style.display = "block";
-        initAdminAddForm();
-    } else { alert("Wrong Password!"); }
+function processBulkUpload(isOverwrite) {
+    let fileInput = document.getElementById("csvFileInput");
+    if (!fileInput.files.length) return;
+    let reader = new FileReader();
+    reader.onload = function(e) { 
+        if(isOverwrite) catalogData = []; // Full Erase
+        parseCSV(e.target.result); 
+    };
+    reader.readAsText(fileInput.files[0]);
 }
 
-// ... (Rest of your existing functions like switchTab, loadCentralCSV, etc.)
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).style.display = 'block';
+    btn.classList.add('active');
+}
 </script>
 </body>
 </html>
