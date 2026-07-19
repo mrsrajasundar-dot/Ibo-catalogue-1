@@ -44,11 +44,19 @@
         .copy-btn { font-size: 11px; color: #475569; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
         
         /* EXCLUSIVE STOCK COUNTER - GREEN */
-        .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 20px; background: #16a34a; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(22, 163, 74, 0.2); letter-spacing: 0.3px; }
+        .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 10px; background: #16a34a; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(22, 163, 74, 0.2); letter-spacing: 0.3px; }
+        .btn-download-server { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
         
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .admin-section { background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 12px; margin-top: 10px; }
         
+        /* FORMAT REFERENCE BOX */
+        .format-reference-box { background: #fffdf5; border: 1px dashed #eab308; padding: 12px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; color: #854d0e; line-height: 1.5; }
+        .format-table-preview { width: 100%; border-collapse: collapse; margin-top: 6px; margin-bottom: 10px; font-size: 11px; background: #fff; }
+        .format-table-preview th, .format-table-preview td { border: 1px solid #fcd34d; padding: 4px 6px; text-align: left; font-family: monospace; }
+        .format-table-preview th { background: #fef08a; }
+        .btn-download-sample { display: inline-block; padding: 6px 12px; background: #eab308; color: #fff; border: none; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; margin-top: 4px; }
+
         .cart-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .qty-input { width: 65px; padding: 6px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; }
         .btn-add-cart { padding: 8px 14px; background: #16a34a; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
@@ -127,6 +135,7 @@
             </div>
             
             <div class="data-counter" id="totalItemsCounter">Loading Data Pool Count...</div>
+            <button class="btn-download-server" onclick="downloadFullServerDataToExcel()">📥 Download Full Server Data to Excel</button>
             
             <div class="admin-section" style="margin-bottom: 20px;">
                 <h4 style="margin:0 0 10px 0; color:#334155;">➕ Add Single Product</h4>
@@ -155,7 +164,16 @@
 
             <div class="admin-section">
                 <h4 style="margin:0 0 5px 0; color:#334155;">📥 Dynamic CSV File Upload</h4>
-                <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Format mapping: offerid, category, class, subclass, brand, name</p>
+                
+                <!-- NEW FORMAT INSTRUCTION & DOWNLOAD SAMPLE BOARD -->
+                <div class="format-reference-box">
+                    ⚠️ <strong>Excel / CSV Upload Format Guideline:</strong><br>
+                    Upload panra sheet exact ah intha structural header order la thaan irukanum. Map guidelines clear ah code panna keela irukira sample template use pannikonga:<br>
+                    <table class="format-table-preview">
+                        <tr><th>offerid</th><th>category</th><th>class</th><th>subclass</th><th>brand</th><th>name</th></tr>
+                    </table>
+                    <button class="btn-download-sample" onclick="downloadSampleHeaderFormat()">🔽 Download Sample Header File</button>
+                </div>
                 
                 <div style="background:#fff; border:1px solid #cbd5e1; padding:10px; border-radius:8px;">
                     <label style="font-size:13px; font-weight:bold; color:#475569;">Select CSV File:</label>
@@ -199,7 +217,7 @@ function parseCSVTextData(text, isAppendMode) {
     let lines = text.split(/\r?\n/);
     let headerIndex = -1;
     for(let i = 0; i < Math.min(lines.length, 10); i++) {
-        if(lines[i].includes("offerid") || lines[i].includes("category")) { headerIndex = i; break; }
+        if(lines[i].toLowerCase().includes("offerid") || lines[i].toLowerCase().includes("category")) { headerIndex = i; break; }
     }
     let startIndex = headerIndex !== -1 ? headerIndex + 1 : 1;
     let tempArray = [];
@@ -216,7 +234,7 @@ function parseCSVTextData(text, isAppendMode) {
             let brand = columns[4].replace(/^"|"$/g, '').trim();
             let name = columns[5].replace(/^"|"$/g, '').trim();
             
-            if(id.includes("IBO") || id.includes("offer") || (!id && !name && !cat)) continue;
+            if(id.toLowerCase().includes("ibo") || id.toLowerCase().includes("offer") || (!id && !name && !cat)) continue;
             
             if(!id || !name || !cat || !cls || !sub || !brand) {
                 alert(`🚨 File Validation Error!\nRow ${i + 1} la category, class, subclass, brand, offerid, illa product name field fill aagama empty ah iruku! Please check details.`);
@@ -248,6 +266,32 @@ function updateStockCounterDisplay() {
     if(counter) {
         counter.innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
     }
+}
+
+function downloadFullServerDataToExcel() {
+    if(catalogData.length === 0) { alert("Server data list empty-ah iruku, download panna mudiyathu!"); return; }
+    let csvContent = "data:text/csv;charset=utf-8,offerid,category,class,subclass,brand,name\n";
+    catalogData.forEach(item => {
+        csvContent += `"${item.id}","${item.cat.replace(/"/g, '""')}","${item.cls.replace(/"/g, '""')}","${item.sub.replace(/"/g, '""')}","${item.brand.replace(/"/g, '""')}","${item.name.replace(/"/g, '""')}"\n`;
+    });
+    let link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `Full_Server_Stock_Report.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("Full Server Excel Downloaded! 📥");
+}
+
+function downloadSampleHeaderFormat() {
+    let csvContent = "data:text/csv;charset=utf-8,offerid,category,class,subclass,brand,name\n";
+    let link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `IBO_Upload_Model_Format.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("Sample Header Template Downloaded! 📄");
 }
 
 function populateAllDropdownsInitial() {
@@ -478,7 +522,6 @@ function exportFolderToCSV() {
 }
 
 function switchTab(tabId, btn) {
-    // SECURITY AUTO-LOCK: Triggered immediately if moving away from Admin tab
     if (tabId !== 'admin-tab') {
         lockAdminPanel();
     }
