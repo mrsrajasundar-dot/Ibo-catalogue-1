@@ -8,8 +8,8 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e5e7eb; }
         .app-header { background: #0284c7; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; }
-        .tab-bar { display: flex; background: #e2e8f0; border-bottom: 1px solid #cbd5e1; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 600; cursor: pointer; color: #475569; font-size: 13px; }
+        .tab-bar { display: flex; background: #e2e8f0; border-bottom: 1px solid #cbd5e1; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 600; cursor: pointer; color: #475569; font-size: 13px; white-space: nowrap; }
         .tab-btn.active { background: #ffffff; color: #0284c7; border-bottom: 3px solid #0284c7; }
         .tab-content { padding: 20px; display: none; }
         .tab-content.active { display: block; }
@@ -17,13 +17,11 @@
         .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #374151; font-size: 14px; }
         select, input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; }
         .btn-clear-all { width: 100%; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; text-transform: uppercase; }
-        .btn-clear-all:active { background: #dc2626; }
         .btn-primary { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; }
         .btn-primary:active { background: #0369a1; }
         .filter-row-search { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
         .btn-search-trigger { padding: 12px 18px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
         .btn-success { width: 100%; padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-success:active { background: #15803d; }
         .result-section { margin-top: 15px; background: #f0f9ff; border: 1px dashed #0284c7; border-radius: 10px; padding: 15px; }
         .product-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .copy-tile { background: #f8fafc; border: 1px solid #e2e2e2; border-radius: 6px; padding: 8px; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -32,14 +30,12 @@
         .copy-btn { font-size: 11px; color: #0284c7; font-weight: bold; background: #e0f2fe; padding: 3px 6px; border-radius: 4px; }
         .data-counter { text-align: center; font-size: 13px; color: #1e293b; font-weight: bold; margin-bottom: 15px; background: #f1f5f9; padding: 8px; border-radius: 6px; }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; }
-        .loading-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #0284c7; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto 10px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .admin-section { background: #fafafa; border: 2px dashed #94a3b8; padding: 15px; border-radius: 10px; margin-top: 10px; }
         .cart-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
         .qty-input { width: 70px; padding: 5px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; }
         .btn-add-cart { padding: 6px 12px; background: #16a34a; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
         .contact-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px; }
-        .contact-title { font-size: 15px; font-weight: bold; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        .contact-title { font-size: 15px; font-weight: bold; color: #475569; text-transform: uppercase; }
         .contact-name { font-size: 24px; font-weight: 800; color: #0284c7; margin: 10px 0 5px 0; }
         .contact-phone { font-size: 20px; font-weight: bold; color: #1e293b; text-decoration: none; display: inline-block; margin-top: 5px; background: #e0f2fe; padding: 8px 15px; border-radius: 8px; }
     </style>
@@ -50,53 +46,34 @@
     <div class="app-header">Smart Catalog Central</div>
     
     <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('search-tab', this)">🔍 Search Engine</button>
-        <button class="tab-btn" onclick="switchTab('folder-tab', this)">📂 Export Folder (<span id="cartCountBadge">0</span>)</button>
+        <button class="tab-btn active" onclick="switchTab('search-tab', this)">🔍 Search</button>
+        <button class="tab-btn" onclick="switchTab('folder-tab', this)">📂 Folder (<span id="cartCountBadge">0</span>)</button>
+        <button class="tab-btn" onclick="switchTab('admin-tab', this)">⚙️ Admin Control</button>
         <button class="tab-btn" onclick="switchTab('info-tab', this)">📞 Contact</button>
     </div>
 
     <!-- TAB 1: SEARCH ENGINE -->
     <div id="search-tab" class="tab-content active">
-        <div class="data-counter" id="totalItemsCounter">
-            <div class="loading-spinner"></div>
-            Connecting Central Database...
-        </div>
+        <div class="data-counter" id="totalItemsCounter">Connecting Central Database...</div>
         
         <div id="filterFieldsForm" style="display:none;">
-            <!-- ONE SINGLE MASTER RESET BUTTON FOR ALL FILTERS -->
             <button class="btn-clear-all" onclick="resetEverythingMaster()">🔄 Reset All Filters & Fields</button>
 
-            <!-- Dropdown Filters -->
-            <div class="form-group">
-                <label>Category</label>
-                <select id="category" onchange="handleDropdownChange()"><option value="">-- All Categories --</option></select>
-            </div>
-            <div class="form-group">
-                <label>Class</label>
-                <select id="class" onchange="handleDropdownChange()"><option value="">-- All Classes --</option></select>
-            </div>
-            <div class="form-group">
-                <label>Sub Class</label>
-                <select id="subclass" onchange="handleDropdownChange()"><option value="">-- All Sub Classes --</option></select>
-            </div>
-            <div class="form-group">
-                <label>Brand</label>
-                <select id="brand" onchange="handleDropdownChange()"><option value="">-- All Brands --</option></select>
-            </div>
+            <div class="form-group"><label>Category</label><select id="category" onchange="handleDropdownChange()"><option value="">-- All Categories --</option></select></div>
+            <div class="form-group"><label>Class</label><select id="class" onchange="handleDropdownChange()"><option value="">-- All Classes --</option></select></div>
+            <div class="form-group"><label>Sub Class</label><select id="subclass" onchange="handleDropdownChange()"><option value="">-- All Sub Classes --</option></select></div>
+            <div class="form-group"><label>Brand</label><select id="brand" onchange="handleDropdownChange()"><option value="">-- All Brands --</option></select></div>
 
             <button class="btn-primary" onclick="triggerFilterSubmit()">🔍 Show Results</button>
             
-            <!-- RESULTS VIEW -->
             <div class="result-section" id="resultSection" style="display:none;">
-                <!-- ADVANCED SMART FILTER BOX (TOP OF RESULTS) -->
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label style="color:#0284c7; font-size:14px; font-weight:bold;">🎯 Smart Search Current List (e.g., 90m, FR, 1.5, Name)</label>
+                <div class="form-group">
+                    <label style="color:#0284c7; font-size:14px; font-weight:bold;">🎯 Smart Search Current List</label>
                     <div class="filter-row-search">
-                        <input type="text" id="masterSearchInput" placeholder="Type words (split by space) and hit search...">
+                        <input type="text" id="masterSearchInput" placeholder="Type words (e.g., 90m FR 1.5)...">
                         <button class="btn-search-trigger" onclick="handleMasterSearch()">🔍</button>
                     </div>
                 </div>
-
                 <div style="font-weight:bold; color:#0369a1; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
                 <div id="multipleResultsContainer"></div>
             </div>
@@ -106,17 +83,45 @@
     <!-- TAB 2: EXPORT FOLDER -->
     <div id="folder-tab" class="tab-content">
         <h3 style="margin-top:0; color:#0f172a;">📂 Saved Folder Items</h3>
-        <p style="font-size:12px; color:#64748b; margin-bottom:15px;">Inge save seiyum data-vai Excel (CSV) file-ah dynamic export seiyalam.</p>
-        
-        <div id="cartItemsContainer" style="margin-bottom:20px;">
-            <p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>Folder is empty.</p>
-        </div>
-        
+        <div id="cartItemsContainer"><p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>Folder is empty.</p></div>
         <button class="btn-success" id="btnExportExcel" onclick="exportFolderToCSV()" style="display:none;">📊 Export Folder to Excel</button>
         <button class="btn-primary" style="background:#ef4444; margin-top:10px;" onclick="clearFolder()">🚨 Clear Full Folder</button>
     </div>
 
-    <!-- TAB 3: CONTACT INFORMATION -->
+    <!-- TAB 3: ADMIN CONTROL MANAGEMENT -->
+    <div id="admin-tab" class="tab-content">
+        <h3 style="margin-top:0; color:#0f172a;">⚙️ Database Management Panel</h3>
+        
+        <!-- BLOCK A: SINGLE PRODUCT INSERTION -->
+        <div class="admin-section" style="margin-bottom: 20px;">
+            <h4 style="margin:0 0 10px 0; color:#0284c7;">➕ Add Single Product</h4>
+            <div class="form-group"><label>Offer ID *</label><input type="text" id="newOfferId" placeholder="Ex: 5002931"></div>
+            <div class="form-group"><label>Product Name *</label><input type="text" id="newProdName" placeholder="Ex: Polycab Wire 1.5 sq mm"></div>
+            <div class="form-group"><label>Category</label><input type="text" id="newCat" placeholder="Ex: Electricals"></div>
+            <div class="form-group"><label>Class</label><input type="text" id="newClass" placeholder="Ex: Wires & Cables"></div>
+            <div class="form-group"><label>Sub Class</label><input type="text" id="newSubClass" placeholder="Ex: FR PVC Wires"></div>
+            <div class="form-group"><label>Brand</label><input type="text" id="newBrand" placeholder="Ex: Polycab"></div>
+            <button class="btn-success" style="width:100%; margin-top:5px;" onclick="addSingleProductManual()">Save New Product</button>
+        </div>
+
+        <!-- BLOCK B: DATA FILE UPLOAD ENGINE -->
+        <div class="admin-section">
+            <h4 style="margin:0 0 5px 0; color:#ea580c;">📥 Dynamic CSV File Upload</h4>
+            <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Format mapping: offerid, category, class, subclass, brand, name</p>
+            
+            <div style="background:#fff; border:1px solid #cbd5e1; padding:10px; border-radius:8px;">
+                <label style="font-size:13px; font-weight:bold; color:#475569;">Select CSV File:</label>
+                <input type="file" id="csvFileInput" accept=".csv" style="padding:5px; margin-top:5px; font-size:12px; border:none;">
+            </div>
+            
+            <div style="margin-top:12px; display:flex; gap:8px;">
+                <button class="btn-primary" style="background:#ef4444; margin:0; font-size:12px;" onclick="processBulkUpload(true)">💥 Bulk Replace (Overwrites All)</button>
+                <button class="btn-primary" style="background:#16a34a; margin:0; font-size:12px;" onclick="processBulkUpload(false)">➕ Append Reports (Merge Items)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: CONTACT INFORMATION -->
     <div id="info-tab" class="tab-content">
         <div class="contact-box">
             <div class="contact-title">Any Support Contact</div>
@@ -135,44 +140,45 @@ let exportFolder = [];
 
 function loadCentralCSV() {
     fetch('IBO STOCK-1.csv')
-    .then(response => {
-        if (!response.ok) throw new Error('CSV File missing!');
-        return response.text();
-    })
-    .then(text => parseCSVTextData(text))
-    .catch(error => {
-        document.getElementById("totalItemsCounter").innerHTML = `🚨 Error: IBO STOCK-1.csv missing in your repository!`;
-    });
+    .then(response => { if (!response.ok) throw new Error(); return response.text(); })
+    .then(text => parseCSVTextData(text, false))
+    .catch(() => { document.getElementById("totalItemsCounter").innerText = `⚠️ Setup Admin configurations or upload CSV via panel!`; document.getElementById("filterFieldsForm").style.display = "block"; });
 }
 
-function parseCSVTextData(text) {
+function parseCSVTextData(text, isAppendMode) {
     let lines = text.split(/\r?\n/);
     let headerIndex = -1;
     for(let i = 0; i < Math.min(lines.length, 10); i++) {
-        if(lines[i].includes("offerid") || lines[i].includes("offer") || lines[i].includes("category")) {
-            headerIndex = i; break;
-        }
+        if(lines[i].includes("offerid") || lines[i].includes("category")) { headerIndex = i; break; }
     }
     let startIndex = headerIndex !== -1 ? headerIndex + 1 : 1;
+    let tempArray = [];
     
     for(let i = startIndex; i < lines.length; i++) {
-        let line = lines[i].trim();
-        if(!line) continue;
+        let line = lines[i].trim(); if(!line) continue;
         let columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
         if(columns.length >= 6) {
-            let id = columns[0].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
-            let cat = columns[1].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
-            let cls = columns[2].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
-            let sub = columns[3].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
-            let brand = columns[4].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
-            let name = columns[5].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
-            
+            let id = columns[0].replace(/^"|"$/g, '').trim();
+            let cat = columns[1].replace(/^"|"$/g, '').trim();
+            let cls = columns[2].replace(/^"|"$/g, '').trim();
+            let sub = columns[3].replace(/^"|"$/g, '').trim();
+            let brand = columns[4].replace(/^"|"$/g, '').trim();
+            let name = columns[5].replace(/^"|"$/g, '').trim();
             if(id && name && !id.includes("IBO") && !id.includes("offer")) {
-                catalogData.push({ id, cat, cls, sub, brand, name });
+                tempArray.push({ id, cat, cls, sub, brand, name });
             }
         }
     }
-    document.getElementById("totalItemsCounter").innerText = `🟢 Cloud Database Loaded: ${catalogData.length} Items`;
+    
+    if(isAppendMode) {
+        catalogData = catalogData.concat(tempArray);
+        showToast(`Appended ${tempArray.length} items successfully!`);
+    } else {
+        catalogData = tempArray;
+        showToast(`Database synchronized with ${tempArray.length} items!`);
+    }
+    
+    document.getElementById("totalItemsCounter").innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
     document.getElementById("filterFieldsForm").style.display = "block";
     populateAllDropdownsInitial();
 }
@@ -190,8 +196,7 @@ function populateSingleDropdown(id, list) {
     let label = id === "subclass" ? "Sub Classes" : id.charAt(0).toUpperCase() + id.slice(1) + "s";
     select.innerHTML = `<option value="">-- All ${label} --</option>`;
     list.filter(Boolean).sort().forEach(v => {
-        let opt = document.createElement("option");
-        opt.value = v; opt.innerText = v;
+        let opt = document.createElement("option"); opt.value = v; opt.innerText = v;
         if(v === currentVal) opt.selected = true;
         select.appendChild(opt);
     });
@@ -202,32 +207,26 @@ function handleDropdownChange() {
     let clsVal = document.getElementById("class").value;
     let subVal = document.getElementById("subclass").value;
     let brdVal = document.getElementById("brand").value;
-    
     let matches = catalogData;
     if(catVal) matches = matches.filter(i => i.cat === catVal);
     if(clsVal) matches = matches.filter(i => i.cls === clsVal);
     if(subVal) matches = matches.filter(i => i.sub === subVal);
     if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    
     if(!catVal) populateSingleDropdown("category", [...new Set(matches.map(i => i.cat))]);
     if(!clsVal) populateSingleDropdown("class", [...new Set(matches.map(i => i.cls))]);
     if(!subVal) populateSingleDropdown("subclass", [...new Set(matches.map(i => i.sub))]);
     if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))]);
 }
 
-// SINGLE ORE BUTTON METHOD TO ERASE ALL TRACES
 function resetEverythingMaster() {
     document.getElementById("category").value = "";
     document.getElementById("class").value = "";
     document.getElementById("subclass").value = "";
     document.getElementById("brand").value = "";
     document.getElementById("masterSearchInput").value = "";
-    
     populateAllDropdownsInitial();
     activeFilteredMatches = [];
-    
     document.getElementById("resultSection").style.display = "none";
-    document.getElementById("multipleResultsContainer").innerHTML = "";
     showToast("Everything Reset Cleanly! 🔄");
 }
 
@@ -237,137 +236,125 @@ function triggerFilterSubmit() {
     let clsVal = document.getElementById("class").value;
     let subVal = document.getElementById("subclass").value;
     let brdVal = document.getElementById("brand").value;
-    
     let matches = catalogData;
     if(catVal) matches = matches.filter(i => i.cat === catVal);
     if(clsVal) matches = matches.filter(i => i.cls === clsVal);
     if(subVal) matches = matches.filter(i => i.sub === subVal);
     if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    
     activeFilteredMatches = matches;
     document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${matches.length}`;
     renderCatalogCards(activeFilteredMatches.slice(0, 100));
     document.getElementById("resultSection").style.display = "block";
 }
 
-// ADVANCED SEGMENTED MULTI-KEYWORD MATCHER (Hangs-Proof Protection)
 function handleMasterSearch() {
     let rawQuery = document.getElementById("masterSearchInput").value.toLowerCase().trim();
-    
-    // Base targeting relies on dropdown selection pool. If empty, searches global catalog base
     let currentPool = activeFilteredMatches.length > 0 ? activeFilteredMatches : catalogData;
-    
     if(!rawQuery) {
         renderCatalogCards(currentPool.slice(0, 100));
         document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${currentPool.length}`;
         return;
     }
-    
-    // Splits input by space to support parallel segmented lookups like "90m" "FR" "1.5"
     let searchTerms = rawQuery.split(/\s+/);
-    
     let textFiltered = currentPool.filter(item => {
-        let targetText = (item.id + " " + item.name).toLowerCase();
-        // Item must contain EVERY input term entered in the input row array
+        let targetText = (item.id + " " + item.name + " " + item.brand).toLowerCase();
         return searchTerms.every(term => targetText.includes(term));
     });
-    
     document.getElementById("resultCountLabel").innerText = `🎯 Filtered Matches: ${textFiltered.length}`;
     renderCatalogCards(textFiltered.slice(0, 100));
 }
 
-function renderCatalogCards(dataList) {
-    let container = document.getElementById("multipleResultsContainer");
-    container.innerHTML = "";
+function addSingleProductManual() {
+    let id = document.getElementById("newOfferId").value.trim();
+    let name = document.getElementById("newProdName").value.trim();
+    let cat = document.getElementById("newCat").value.trim() || "Uncategorized";
+    let cls = document.getElementById("newClass").value.trim() || "General Class";
+    let sub = document.getElementById("newSubClass").value.trim() || "General SubClass";
+    let brand = document.getElementById("newBrand").value.trim() || "Generic";
     
+    if(!id || !name) { alert("Please type Offer ID and Product Name!"); return; }
+    
+    catalogData.unshift({ id, cat, cls, sub, brand, name });
+    document.getElementById("totalItemsCounter").innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
+    
+    // Clear Admin UI fields
+    document.getElementById("newOfferId").value = ""; document.getElementById("newProdName").value = "";
+    populateAllDropdownsInitial();
+    showToast("Product Added Successfully! ✅");
+}
+
+function processBulkUpload(isOverwrite) {
+    let fileInput = document.getElementById("csvFileInput");
+    if (!fileInput.files.length) { alert("Please choose a CSV sheet file first!"); return; }
+    
+    let file = fileInput.files[0];
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let text = e.target.result;
+        parseCSVTextData(text, !isOverwrite);
+        fileInput.value = ""; 
+    };
+    reader.readAsText(file);
+}
+
+function renderCatalogCards(dataList) {
+    let container = document.getElementById("multipleResultsContainer"); container.innerHTML = "";
     if(dataList.length > 0) {
         dataList.forEach((match) => {
             container.innerHTML += `
                 <div class="product-card">
                     <div class="copy-tile" onclick="copyTextDirect('${match.id}', 'Offer ID')">
-                        <div><span class="tile-label">Offer ID</span><br><span class="tile-value">${match.id}</span></div>
-                        <div class="copy-btn">📋 Copy</div>
+                        <div><span class="tile-label">Offer ID</span><br><span class="tile-value">${match.id}</span></div><div class="copy-btn">📋 Copy</div>
                     </div>
                     <div class="copy-tile" onclick="copyTextDirect('${match.name}', 'Product Name')">
-                        <div><span class="tile-label">Product Name</span><br><span class="tile-value">${match.name}</span></div>
-                        <div class="copy-btn">📋 Copy</div>
+                        <div><span class="tile-label">Product Name</span><br><span class="tile-value">${match.name}</span></div><div class="copy-btn">📋 Copy</div>
                     </div>
                     <div class="cart-controls">
                         <div><span style="font-size:12px; font-weight:600; color:#475569;">Qty:</span>
                         <input type="number" class="qty-input" id="qty_${match.id}" value="1" min="1"></div>
                         <button class="btn-add-cart" onclick="addToExportFolder('${match.id}')">➕ Add to Folder</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
-    } else {
-        container.innerHTML = "<div style='text-align:center; font-size:13px; color:#64748b; padding:10px;'>No matching products found. Try modifying keywords!</div>";
-    }
+    } else { container.innerHTML = "<div style='text-align:center; font-size:13px; color:#64748b; padding:10px;'>No products found.</div>"; }
 }
 
 function addToExportFolder(id) {
     let item = catalogData.find(i => i.id === id);
     let qtyVal = parseInt(document.getElementById(`qty_${id}`).value) || 1;
     let existingIndex = exportFolder.findIndex(i => i.id === id);
-    if(existingIndex > -1) {
-        exportFolder[existingIndex].qty += qtyVal;
-    } else {
-        exportFolder.push({ id: item.id, name: item.name, qty: qtyVal });
-    }
-    updateCartUI();
-    showToast("Added to Export Folder! ✔️");
+    if(existingIndex > -1) exportFolder[existingIndex].qty += qtyVal;
+    else exportFolder.push({ id: item.id, name: item.name, qty: qtyVal });
+    updateCartUI(); showToast("Added to Folder! ✔️");
 }
 
 function updateCartUI() {
     document.getElementById("cartCountBadge").innerText = exportFolder.length;
     let container = document.getElementById("cartItemsContainer");
-    let btnExcel = document.getElementById("btnExportExcel");
-    container.innerHTML = "";
-    if(exportFolder.length === 0) {
-        container.innerHTML = "<p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>Folder is empty.</p>";
-        btnExcel.style.display = "none";
-        return;
-    }
+    let btnExcel = document.getElementById("btnExportExcel"); container.innerHTML = "";
+    if(exportFolder.length === 0) { container.innerHTML = "<p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>Folder is empty.</p>"; btnExcel.style.display = "none"; return; }
     exportFolder.forEach((item, index) => {
         container.innerHTML += `
-            <div class="cart-item-row">
-                <div style="max-width: 70%;"><strong>${item.id}</strong> - <span style="color:#475569;">${item.name}</span></div>
-                <div>
+            <div style="display:flex; justify-content:between; align-items:center; padding:8px 0; border-bottom:1px solid #e2e8f0; font-size:13px;">
+                <div style="max-width:70%;"><strong>${item.id}</strong> - ${item.name}</div>
+                <div style="margin-left:auto;">
                     <span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-weight:bold;">Qty: ${item.qty}</span>
                     <span style="color:#ef4444; font-weight:bold; margin-left:10px; cursor:pointer;" onclick="removeFromFolder(${index})">❌</span>
                 </div>
-            </div>
-        `;
+            </div>`;
     });
     btnExcel.style.display = "block";
 }
 
-function removeFromFolder(index) {
-    exportFolder.splice(index, 1);
-    updateCartUI();
-}
-
-function clearFolder() {
-    exportFolder = [];
-    updateCartUI();
-    showToast("Folder Cleared!");
-}
+function removeFromFolder(index) { exportFolder.splice(index, 1); updateCartUI(); }
+function clearFolder() { exportFolder = []; updateCartUI(); showToast("Folder Cleared!"); }
 
 function exportFolderToCSV() {
     if(exportFolder.length === 0) return;
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Offer ID,Product Name,Quantity\n";
-    exportFolder.forEach(item => {
-        let cleanName = item.name.replace(/"/g, '""');
-        csvContent += `"${item.id}","${cleanName}",${item.qty}\n`;
-    });
-    let encodedUri = encodeURI(csvContent);
-    let link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Catalog_Export_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    let csvContent = "data:text/csv;charset=utf-8,Offer ID,Product Name,Quantity\n";
+    exportFolder.forEach(item => { csvContent += `"${item.id}","${item.name.replace(/"/g, '""')}",${item.qty}\n`; });
+    let link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `Catalog_Report.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
 
 function switchTab(tabId, btn) {
@@ -376,18 +363,10 @@ function switchTab(tabId, btn) {
     document.getElementById(tabId).style.display = 'block';
     if(btn) btn.classList.add('active');
 }
+function copyTextDirect(text, label) { navigator.clipboard.writeText(text).then(() => showToast(label + " Copied! 👍")); }
+function showToast(msg) { let t = document.getElementById("toastBox"); t.innerText = msg; t.style.display = "block"; setTimeout(() => t.style.display="none", 2000); }
 
-function copyTextDirect(text, label) {
-    navigator.clipboard.writeText(text).then(() => showToast(label + " Copied! 👍"));
-}
-
-function showToast(msg) {
-    let t = document.getElementById("toastBox"); t.innerText = msg; t.style.display = "block"; setTimeout(() => t.style.display="none", 2000);
-}
-
-window.onload = function() {
-    loadCentralCSV();
-};
+window.onload = function() { loadCentralCSV(); };
 </script>
 </body>
 </html>
