@@ -39,7 +39,6 @@
         
         .filter-row-search { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
         .btn-search-trigger { padding: 12px 18px; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .btn-success { width: 100%; padding: 13px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
         .result-section { margin-top: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
         .product-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -50,13 +49,9 @@
         .copy-btn { font-size: 11px; color: #475569; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
         
         .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 10px; background: #16a34a; padding: 12px; border-radius: 8px; }
-        
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 10000; }
         
-        .cart-controls { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .qty-input { width: 65px; padding: 6px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; }
-        .folder-select { width: 100%; padding: 6px; font-size: 13px; border-radius: 6px; border: 1px solid #cbd5e1; }
-        .btn-add-cart { padding: 8px 14px; background: #16a34a; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; }
+        .btn-add-cart { padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; margin-top: 12px; }
         
         /* FOLDER CARD DESIGNS */
         .folder-block { border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; background: #fff; overflow: hidden; }
@@ -66,12 +61,56 @@
         .contact-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px; }
         .contact-name { font-size: 24px; font-weight: 800; color: #334155; margin: 10px 0 8px 0; }
         .contact-phone { font-size: 18px; font-weight: bold; text-decoration: none; display: inline-block; background: #f1f5f9; color: #334155; padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; }
+
+        /* DYNAMIC POPUP MODAL STYLES */
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 99999; display: none; }
+        .modal-content { background: #fff; width: 90%; max-width: 400px; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); box-sizing: border-box; }
+        .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #1e293b; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: flex-end; }
+        .btn-modal-cancel { padding: 10px 15px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-modal-save { padding: 10px 20px; background: #16a34a; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .folder-mode-container { display: flex; gap: 10px; margin-bottom: 12px; }
+        .btn-mode-toggle { flex: 1; padding: 8px; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; color: #64748b; }
+        .btn-mode-toggle.active { background: #334155; color: white; border-color: #334155; }
     </style>
 </head>
 <body>
 
 <div id="appSplashScreen" class="splash-screen" style="display: none;">
     Welcome to IBO Smart Catalog
+</div>
+
+<!-- DYNAMIC POPUP MODAL -->
+<div id="folderModalOverlay" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-title">📂 Add Product to Folder</div>
+        
+        <div class="form-group" style="margin-bottom: 12px;">
+            <label>Quantity</label>
+            <input type="number" id="modalQtyInput" value="1" min="1">
+        </div>
+
+        <label style="display:block; font-weight:600; margin-bottom:6px; color:#475569; font-size:14px;">Folder Option</label>
+        <div class="folder-mode-container">
+            <button id="modeSelectBtn" class="btn-mode-toggle active" onclick="setFolderMode('SELECT')">Existing Folder</button>
+            <button id="modeCreateBtn" class="btn-mode-toggle" onclick="setFolderMode('CREATE')">Create New</button>
+        </div>
+
+        <!-- Box 1: Select Existing Folder -->
+        <div id="modalSelectBox" class="form-group">
+            <select id="modalFolderSelect"></select>
+        </div>
+
+        <!-- Box 2: Create New Folder -->
+        <div id="modalCreateBox" class="form-group" style="display: none;">
+            <input type="text" id="modalNewFolderInput" placeholder="Enter new folder name (e.g., Rajan)">
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeFolderModal()">Cancel</button>
+            <button class="btn-modal-save" onclick="submitFolderModalData()">Save Item</button>
+        </div>
+    </div>
 </div>
 
 <div class="app-container">
@@ -151,6 +190,10 @@ let activeFilteredMatches = [];
 
 // SECURE LOCAL STORAGE FOR PRIVATE DATA PER PHONE
 let folderDatabase = JSON.parse(localStorage.getItem("ibo_folders")) || {}; 
+// MEMORY TO HOLD THE LAST SELECTED FOLDER NAME AS DEFAULT
+let lastSelectedFolder = localStorage.getItem("ibo_last_folder") || ""; 
+let currentTargetProductId = "";
+let currentFolderMode = "SELECT"; // SELECT or CREATE
 
 function triggerSplashScreen() {
     let splash = document.getElementById("appSplashScreen");
@@ -261,19 +304,8 @@ function handleMasterSearch() {
     renderCatalogCards(filtered.slice(0, 100));
 }
 
-// MULTI-FOLDER SYSTEM OPTIONS LIST GENERATION
-function getFolderDropdownOptions() {
-    let options = `<option value="NEW_FOLDER">🆕 [+ Create New Folder Name]</option>`;
-    Object.keys(folderDatabase).forEach(fName => {
-        options += `<option value="${fName}">📂 ${fName}</option>`;
-    });
-    return options;
-}
-
 function renderCatalogCards(dataList) {
     let container = document.getElementById("multipleResultsContainer"); container.innerHTML = "";
-    let folderOptions = getFolderDropdownOptions();
-    
     if(dataList.length > 0) {
         dataList.forEach((match) => {
             container.innerHTML += `
@@ -284,43 +316,85 @@ function renderCatalogCards(dataList) {
                     <div class="copy-tile" onclick="copyTextDirect('${match.name}', 'Product Name')">
                         <div><span class="tile-label">Product Name</span><br><span class="tile-value">${match.name}</span></div><div class="copy-btn">📋 Copy</div>
                     </div>
-                    <div class="cart-controls">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:12px; font-weight:600;">Qty:</span>
-                            <input type="number" class="qty-input" id="qty_${match.id}" value="1" min="1">
-                        </div>
-                        <div>
-                            <span style="font-size:11px; font-weight:600; color:#475569;">Select Folder Group:</span>
-                            <select class="folder-select" id="folder_sel_${match.id}">${folderOptions}</select>
-                        </div>
-                        <button class="btn-add-cart" onclick="routingAddToFolder('${match.id}')">➕ Add to Selected Folder</button>
-                    </div>
+                    <button class="btn-add-cart" onclick="openFolderModal('${match.id}')">➕ Add to Folder</button>
                 </div>`;
         });
     } else { container.innerHTML = "<div style='text-align:center; font-size:13px;'>No products found.</div>"; }
 }
 
-// HANDLER FOR CREATING OR ROUTING ITEMS TO CHOSEN FOLDER
-function routingAddToFolder(id) {
-    let selectEl = document.getElementById(`folder_sel_${id}`);
-    let qtyVal = parseInt(document.getElementById(`qty_${id}`).value) || 1;
-    let selectedTarget = selectEl.value;
+// POPUP MODAL CONTROL LOGICS
+function openFolderModal(productId) {
+    currentTargetProductId = productId;
+    document.getElementById("modalQtyInput").value = "1";
+    document.getElementById("modalNewFolderInput").value = "";
+    
+    let selectEl = document.getElementById("modalFolderSelect");
+    selectEl.innerHTML = "";
+    
+    let keys = Object.keys(folderDatabase);
+    
+    if(keys.length === 0) {
+        // No old folders exist, force 'CREATE NEW' mode automatically
+        setFolderMode('CREATE');
+        document.getElementById("modeSelectBtn").style.display = "none"; 
+    } else {
+        document.getElementById("modeSelectBtn").style.display = "block";
+        // Populate existing options
+        keys.forEach(k => {
+            let opt = document.createElement("option");
+            opt.value = k;
+            opt.innerText = `📂 ${k}`;
+            if(k === lastSelectedFolder) opt.selected = true; // Auto-select last used folder!
+            selectEl.appendChild(opt);
+        });
+        setFolderMode('SELECT');
+    }
+    
+    document.getElementById("folderModalOverlay").style.display = "flex";
+}
+
+function closeFolderModal() {
+    document.getElementById("folderModalOverlay").style.display = "none";
+}
+
+function setFolderMode(mode) {
+    currentFolderMode = mode;
+    if(mode === 'SELECT') {
+        document.getElementById("modeSelectBtn").classList.add("active");
+        document.getElementById("modeCreateBtn").classList.remove("active");
+        document.getElementById("modalSelectBox").style.display = "block";
+        document.getElementById("modalCreateBox").style.display = "none";
+    } else {
+        document.getElementById("modeCreateBtn").classList.add("active");
+        document.getElementById("modeSelectBtn").classList.remove("active");
+        document.getElementById("modalSelectBox").style.display = "none";
+        document.getElementById("modalCreateBox").style.display = "block";
+    }
+}
+
+function submitFolderModalData() {
+    let qtyVal = parseInt(document.getElementById("modalQtyInput").value) || 1;
     let finalFolderName = "";
 
-    if (selectedTarget === "NEW_FOLDER") {
-        let userInput = prompt("Enter New Folder Custom Name:");
-        if (!userInput || !userInput.trim()) { alert("Folder name valid ah illai!"); return; }
-        finalFolderName = userInput.trim();
+    if (currentFolderMode === "CREATE") {
+        let inputName = document.getElementById("modalNewFolderInput").value.trim();
+        if(!inputName) { alert("Folder name type pannunga brother!"); return; }
+        finalFolderName = inputName;
     } else {
-        finalFolderName = selectedTarget;
+        finalFolderName = document.getElementById("modalFolderSelect").value;
+        if(!finalFolderName) { alert("Folder yethum select seiyapadavillai!"); return; }
     }
+
+    // Save target tracking name inside memory device
+    lastSelectedFolder = finalFolderName;
+    localStorage.setItem("ibo_last_folder", lastSelectedFolder);
 
     if (!folderDatabase[finalFolderName]) {
         folderDatabase[finalFolderName] = [];
     }
 
-    let pItem = catalogData.find(i => i.id === id);
-    let duplicateIndex = folderDatabase[finalFolderName].findIndex(x => x.id === id);
+    let pItem = catalogData.find(i => i.id === currentTargetProductId);
+    let duplicateIndex = folderDatabase[finalFolderName].findIndex(x => x.id === currentTargetProductId);
     
     if(duplicateIndex > -1) {
         folderDatabase[finalFolderName][duplicateIndex].qty += qtyVal;
@@ -328,11 +402,10 @@ function routingAddToFolder(id) {
         folderDatabase[finalFolderName].push({ id: pItem.id, name: pItem.name, qty: qtyVal });
     }
 
-    // SAVE LOCK TO LOCAL STORAGE DEVICE MEMORY ONLY
     localStorage.setItem("ibo_folders", JSON.stringify(folderDatabase));
     
     updateFoldersUI();
-    renderCatalogCards(activeFilteredMatches.slice(0, 100)); // Refresh selections dropdowns
+    closeFolderModal();
     showToast(`Added to Folder: ${finalFolderName}! ✔️`);
 }
 
@@ -341,7 +414,6 @@ function updateFoldersUI() {
     container.innerHTML = "";
     let keys = Object.keys(folderDatabase);
     
-    // Update total count badge
     let totalItems = 0;
     keys.forEach(k => totalItems += folderDatabase[k].length);
     document.getElementById("cartCountBadge").innerText = totalItems;
@@ -391,6 +463,10 @@ function removeSingleItemFromFolder(folderName, index) {
 function deleteEntireFolderGroup(folderName) {
     if(confirm(`Are you sure you want to delete folder: ${folderName}?`)) {
         delete folderDatabase[folderName];
+        if(lastSelectedFolder === folderName) {
+            lastSelectedFolder = "";
+            localStorage.removeItem("ibo_last_folder");
+        }
         localStorage.setItem("ibo_folders", JSON.stringify(folderDatabase));
         updateFoldersUI();
         showToast("Folder Removed!");
@@ -400,7 +476,9 @@ function deleteEntireFolderGroup(folderName) {
 function clearAllFoldersMaster() {
     if(confirm("Full setup structures dynamic folders templates-ah unga mobile phone memory la irunthu absolute ah clear panni remove panna poringala?")) {
         folderDatabase = {};
+        lastSelectedFolder = "";
         localStorage.removeItem("ibo_folders");
+        localStorage.removeItem("ibo_last_folder");
         updateFoldersUI();
         showToast("Everything Reset Cleanly!");
     }
