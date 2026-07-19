@@ -38,6 +38,7 @@
         .contact-title { font-size: 15px; font-weight: bold; color: #475569; text-transform: uppercase; }
         .contact-name { font-size: 24px; font-weight: 800; color: #0284c7; margin: 10px 0 5px 0; }
         .contact-phone { font-size: 20px; font-weight: bold; color: #1e293b; text-decoration: none; display: inline-block; margin-top: 5px; background: #e0f2fe; padding: 8px 15px; border-radius: 8px; }
+        .lock-screen { text-align: center; padding: 30px 10px; }
     </style>
 </head>
 <body>
@@ -88,35 +89,66 @@
         <button class="btn-primary" style="background:#ef4444; margin-top:10px;" onclick="clearFolder()">🚨 Clear Full Folder</button>
     </div>
 
-    <!-- TAB 3: ADMIN CONTROL MANAGEMENT -->
+    <!-- TAB 3: ADMIN CONTROL MANAGEMENT WITH LOCK SYSTEM -->
     <div id="admin-tab" class="tab-content">
-        <h3 style="margin-top:0; color:#0f172a;">⚙️ Database Management Panel</h3>
-        
-        <!-- BLOCK A: SINGLE PRODUCT INSERTION -->
-        <div class="admin-section" style="margin-bottom: 20px;">
-            <h4 style="margin:0 0 10px 0; color:#0284c7;">➕ Add Single Product</h4>
-            <div class="form-group"><label>Offer ID *</label><input type="text" id="newOfferId" placeholder="Ex: 5002931"></div>
-            <div class="form-group"><label>Product Name *</label><input type="text" id="newProdName" placeholder="Ex: Polycab Wire 1.5 sq mm"></div>
-            <div class="form-group"><label>Category</label><input type="text" id="newCat" placeholder="Ex: Electricals"></div>
-            <div class="form-group"><label>Class</label><input type="text" id="newClass" placeholder="Ex: Wires & Cables"></div>
-            <div class="form-group"><label>Sub Class</label><input type="text" id="newSubClass" placeholder="Ex: FR PVC Wires"></div>
-            <div class="form-group"><label>Brand</label><input type="text" id="newBrand" placeholder="Ex: Polycab"></div>
-            <button class="btn-success" style="width:100%; margin-top:5px;" onclick="addSingleProductManual()">Save New Product</button>
+        <!-- Password UI Screen -->
+        <div id="adminLockScreen" class="lock-screen">
+            <h3 style="margin-top:0; color:#1e293b;">🔒 Admin Authentication</h3>
+            <p style="font-size:13px; color:#64748b;">Intha panel access seiya password enter seiyavum.</p>
+            <div class="form-group" style="margin-top:15px;">
+                <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password...">
+            </div>
+            <button class="btn-primary" onclick="checkAdminPassword()">Verify & Unlock</button>
         </div>
 
-        <!-- BLOCK B: DATA FILE UPLOAD ENGINE -->
-        <div class="admin-section">
-            <h4 style="margin:0 0 5px 0; color:#ea580c;">📥 Dynamic CSV File Upload</h4>
-            <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Format mapping: offerid, category, class, subclass, brand, name</p>
-            
-            <div style="background:#fff; border:1px solid #cbd5e1; padding:10px; border-radius:8px;">
-                <label style="font-size:13px; font-weight:bold; color:#475569;">Select CSV File:</label>
-                <input type="file" id="csvFileInput" accept=".csv" style="padding:5px; margin-top:5px; font-size:12px; border:none;">
+        <!-- Authenticated Operations Panel -->
+        <div id="adminContentPanel" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:8px; margin-bottom:15px;">
+                <h3 style="margin:0; color:#0f172a;">⚙️ Admin Control Panel</h3>
+                <button onclick="lockAdminPanel()" style="padding:4px 8px; background:#64748b; color:white; border:none; border-radius:4px; font-size:11px; cursor:pointer;">🔒 Lock</button>
             </div>
             
-            <div style="margin-top:12px; display:flex; gap:8px;">
-                <button class="btn-primary" style="background:#ef4444; margin:0; font-size:12px;" onclick="processBulkUpload(true)">💥 Bulk Replace (Overwrites All)</button>
-                <button class="btn-primary" style="background:#16a34a; margin:0; font-size:12px;" onclick="processBulkUpload(false)">➕ Append Reports (Merge Items)</button>
+            <!-- BLOCK A: SINGLE PRODUCT INSERTION (DEPENDENT DROPDOWNS SETUP) -->
+            <div class="admin-section" style="margin-bottom: 20px;">
+                <h4 style="margin:0 0 10px 0; color:#0284c7;">➕ Add Single Product</h4>
+                <div class="form-group"><label>Offer ID *</label><input type="text" id="newOfferId" placeholder="Ex: 5002931"></div>
+                <div class="form-group"><label>Product Name *</label><input type="text" id="newProdName" placeholder="Ex: Polycab Wire 1.5 sq mm"></div>
+                
+                <!-- FILTER DEPENDENT DROPDOWNS -->
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="newCat" onchange="handleAdminDropdownChange('cat')"><option value="">-- Select Category --</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="newClass" onchange="handleAdminDropdownChange('cls')"><option value="">-- Select Class --</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Sub Class</label>
+                    <select id="newSubClass" onchange="handleAdminDropdownChange('sub')"><option value="">-- Select Sub Class --</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Brand</label>
+                    <select id="newBrand"><option value="">-- Select Brand --</option></select>
+                </div>
+                
+                <button class="btn-success" style="width:100%; margin-top:5px;" onclick="addSingleProductManual()">Save New Product</button>
+            </div>
+
+            <!-- BLOCK B: DATA FILE UPLOAD ENGINE -->
+            <div class="admin-section">
+                <h4 style="margin:0 0 5px 0; color:#ea580c;">📥 Dynamic CSV File Upload</h4>
+                <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Format mapping: offerid, category, class, subclass, brand, name</p>
+                
+                <div style="background:#fff; border:1px solid #cbd5e1; padding:10px; border-radius:8px;">
+                    <label style="font-size:13px; font-weight:bold; color:#475569;">Select CSV File:</label>
+                    <input type="file" id="csvFileInput" accept=".csv" style="padding:5px; margin-top:5px; font-size:12px; border:none;">
+                </div>
+                
+                <div style="margin-top:12px; display:flex; gap:8px;">
+                    <button class="btn-primary" style="background:#ef4444; margin:0; font-size:12px;" onclick="processBulkUpload(true)">💥 Bulk Replace (Overwrites All)</button>
+                    <button class="btn-primary" style="background:#16a34a; margin:0; font-size:12px;" onclick="processBulkUpload(false)">➕ Append Reports (Merge Items)</button>
+                </div>
             </div>
         </div>
     </div>
@@ -137,6 +169,7 @@
 let catalogData = [];
 let activeFilteredMatches = [];
 let exportFolder = [];
+const ADMIN_PASSWORD = "raja8940"; // Indha password-ah neenga venum na mathikalam brother
 
 function loadCentralCSV() {
     fetch('IBO STOCK-1.csv')
@@ -181,20 +214,30 @@ function parseCSVTextData(text, isAppendMode) {
     document.getElementById("totalItemsCounter").innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
     document.getElementById("filterFieldsForm").style.display = "block";
     populateAllDropdownsInitial();
+    populateAdminDropdownsInitial();
 }
 
+// Global Search Dropdowns setup
 function populateAllDropdownsInitial() {
-    populateSingleDropdown("category", [...new Set(catalogData.map(i => i.cat))]);
-    populateSingleDropdown("class", [...new Set(catalogData.map(i => i.cls))]);
-    populateSingleDropdown("subclass", [...new Set(catalogData.map(i => i.sub))]);
-    populateSingleDropdown("brand", [...new Set(catalogData.map(i => i.brand))]);
+    populateSingleDropdown("category", [...new Set(catalogData.map(i => i.cat))], "Categories");
+    populateSingleDropdown("class", [...new Set(catalogData.map(i => i.cls))], "Classes");
+    populateSingleDropdown("subclass", [...new Set(catalogData.map(i => i.sub))], "Sub Classes");
+    populateSingleDropdown("brand", [...new Set(catalogData.map(i => i.brand))], "Brands");
 }
 
-function populateSingleDropdown(id, list) {
+// Admin Panel Dropdowns Initial Setup
+function populateAdminDropdownsInitial() {
+    populateSingleDropdown("newCat", [...new Set(catalogData.map(i => i.cat))], "Category");
+    populateSingleDropdown("newClass", [...new Set(catalogData.map(i => i.cls))], "Class");
+    populateSingleDropdown("newSubClass", [...new Set(catalogData.map(i => i.sub))], "Sub Class");
+    populateSingleDropdown("newBrand", [...new Set(catalogData.map(i => i.brand))], "Brand");
+}
+
+function populateSingleDropdown(id, list, label) {
     let select = document.getElementById(id);
+    if(!select) return;
     let currentVal = select.value;
-    let label = id === "subclass" ? "Sub Classes" : id.charAt(0).toUpperCase() + id.slice(1) + "s";
-    select.innerHTML = `<option value="">-- All ${label} --</option>`;
+    select.innerHTML = `<option value="">-- Select ${label} --</option>`;
     list.filter(Boolean).sort().forEach(v => {
         let opt = document.createElement("option"); opt.value = v; opt.innerText = v;
         if(v === currentVal) opt.selected = true;
@@ -202,6 +245,7 @@ function populateSingleDropdown(id, list) {
     });
 }
 
+// Search Dropdown Context Limiter Logic
 function handleDropdownChange() {
     let catVal = document.getElementById("category").value;
     let clsVal = document.getElementById("class").value;
@@ -212,10 +256,55 @@ function handleDropdownChange() {
     if(clsVal) matches = matches.filter(i => i.cls === clsVal);
     if(subVal) matches = matches.filter(i => i.sub === subVal);
     if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    if(!catVal) populateSingleDropdown("category", [...new Set(matches.map(i => i.cat))]);
-    if(!clsVal) populateSingleDropdown("class", [...new Set(matches.map(i => i.cls))]);
-    if(!subVal) populateSingleDropdown("subclass", [...new Set(matches.map(i => i.sub))]);
-    if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))]);
+    if(!catVal) populateSingleDropdown("category", [...new Set(matches.map(i => i.cat))], "Categories");
+    if(!clsVal) populateSingleDropdown("class", [...new Set(matches.map(i => i.cls))], "Classes");
+    if(!subVal) populateSingleDropdown("subclass", [...new Set(matches.map(i => i.sub))], "Sub Classes");
+    if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))], "Brands");
+}
+
+// ADMIN DEPENDENT DROPDOWN CONTROLLER
+function handleAdminDropdownChange(level) {
+    let catVal = document.getElementById("newCat").value;
+    let clsVal = document.getElementById("newClass").value;
+    let subVal = document.getElementById("newSubClass").value;
+    
+    let pool = catalogData;
+    
+    if(level === 'cat') {
+        if(catVal) pool = pool.filter(i => i.cat === catVal);
+        populateSingleDropdown("newClass", [...new Set(pool.map(i => i.cls))], "Class");
+        populateSingleDropdown("newSubClass", [...new Set(pool.map(i => i.sub))], "Sub Class");
+        populateSingleDropdown("newBrand", [...new Set(pool.map(i => i.brand))], "Brand");
+    } else if(level === 'cls') {
+        if(catVal) pool = pool.filter(i => i.cat === catVal);
+        if(clsVal) pool = pool.filter(i => i.cls === clsVal);
+        populateSingleDropdown("newSubClass", [...new Set(pool.map(i => i.sub))], "Sub Class");
+        populateSingleDropdown("newBrand", [...new Set(pool.map(i => i.brand))], "Brand");
+    } else if(level === 'sub') {
+        if(catVal) pool = pool.filter(i => i.cat === catVal);
+        if(clsVal) pool = pool.filter(i => i.cls === clsVal);
+        if(subVal) pool = pool.filter(i => i.sub === subVal);
+        populateSingleDropdown("newBrand", [...new Set(pool.map(i => i.brand))], "Brand");
+    }
+}
+
+// PASSWORD SECURITY CONTROLLERS
+function checkAdminPassword() {
+    let inputPass = document.getElementById("adminPasswordInput").value.trim();
+    if(inputPass === ADMIN_PASSWORD) {
+        document.getElementById("adminLockScreen").style.display = "none";
+        document.getElementById("adminContentPanel").style.display = "block";
+        document.getElementById("adminPasswordInput").value = "";
+        showToast("Access Granted! 🔓");
+    } else {
+        alert("Wrong Password! Access Denied.");
+    }
+}
+
+function lockAdminPanel() {
+    document.getElementById("adminContentPanel").style.display = "none";
+    document.getElementById("adminLockScreen").style.display = "block";
+    showToast("Panel Locked! 🔒");
 }
 
 function resetEverythingMaster() {
@@ -267,19 +356,24 @@ function handleMasterSearch() {
 function addSingleProductManual() {
     let id = document.getElementById("newOfferId").value.trim();
     let name = document.getElementById("newProdName").value.trim();
-    let cat = document.getElementById("newCat").value.trim() || "Uncategorized";
-    let cls = document.getElementById("newClass").value.trim() || "General Class";
-    let sub = document.getElementById("newSubClass").value.trim() || "General SubClass";
-    let brand = document.getElementById("newBrand").value.trim() || "Generic";
+    let cat = document.getElementById("newCat").value.trim();
+    let cls = document.getElementById("newClass").value.trim();
+    let sub = document.getElementById("newSubClass").value.trim();
+    let brand = document.getElementById("newBrand").value.trim();
     
-    if(!id || !name) { alert("Please type Offer ID and Product Name!"); return; }
+    if(!id || !name || !cat || !cls || !sub || !brand) { 
+        alert("Please fill all inputs: ID, Name, Category, Class, SubClass and Brand!"); 
+        return; 
+    }
     
     catalogData.unshift({ id, cat, cls, sub, brand, name });
     document.getElementById("totalItemsCounter").innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
     
-    // Clear Admin UI fields
-    document.getElementById("newOfferId").value = ""; document.getElementById("newProdName").value = "";
+    // Clear Admin inputs & refresh UI dropdown maps
+    document.getElementById("newOfferId").value = ""; 
+    document.getElementById("newProdName").value = "";
     populateAllDropdownsInitial();
+    populateAdminDropdownsInitial();
     showToast("Product Added Successfully! ✅");
 }
 
