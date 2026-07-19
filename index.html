@@ -7,534 +7,113 @@
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
-        
-        /* DYNAMIC RED SPLASH SCREEN WINDOW */
-        .splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #b91c1c; color: #ffffff; display: flex; justify-content: center; 
-            align-items: center; z-index: 9999; font-size: 24px; font-weight: 800; 
-            letter-spacing: 0.5px; opacity: 1; transition: opacity 0.4s ease-in-out; 
-            text-align: center; padding: 20px; box-sizing: border-box; pointer-events: none;
-        }
-
-        /* HEADER */
-        .app-header { background: #b91c1c; color: #ffffff; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border-bottom: 2px solid #a21a1a; }
-        .app-header img { height: 48px; width: auto; max-width: 160px; border-radius: 4px; object-fit: contain; }
-        .app-header-title { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; }
-        
-        /* SLATE CORPORATE TAB BAR */
+        .splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #b91c1c; color: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 24px; font-weight: 800; opacity: 1; transition: opacity 0.4s; text-align: center; padding: 20px; pointer-events: none; }
+        .app-header { background: #b91c1c; color: #ffffff; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #a21a1a; }
+        .app-header-title { font-size: 22px; font-weight: 800; color: #ffffff; }
         .tab-bar { display: flex; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 14px 10px; border: none; background: none; font-weight: 600; cursor: pointer; color: #64748b; font-size: 13px; white-space: nowrap; transition: all 0.2s ease; }
+        .tab-btn { flex: 1; padding: 14px 10px; border: none; background: none; font-weight: 600; cursor: pointer; color: #64748b; font-size: 13px; }
         .tab-btn.active { background: #ffffff; color: #334155; border-bottom: 3px solid #334155; }
-        
         .tab-content { padding: 20px; display: none; }
         .tab-content.active { display: block; }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #475569; font-size: 14px; }
-        select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; color: #1e293b; transition: border 0.2s; }
-        select:focus, input:focus { border-color: #334155; box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1); }
-        
-        .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 18px; text-transform: uppercase; }
-        .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; transition: background 0.2s; }
-        
-        .filter-row-search { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
-        .btn-search-trigger { padding: 12px 18px; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        
-        .result-section { margin-top: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
-        .product-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        
-        .copy-tile { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        .tile-value { font-size: 14px; font-weight: bold; color: #1e293b; margin-top: 2px; }
-        .copy-btn { font-size: 11px; color: #475569; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
-        
-        .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 10px; background: #16a34a; padding: 12px; border-radius: 8px; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 10000; }
-        
-        .btn-add-cart { padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; margin-top: 12px; }
-        
-        /* FOLDER CARD DESIGNS */
-        .folder-block { border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; background: #fff; overflow: hidden; }
-        .folder-header { background: #e2e8f0; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; color: #1e293b; }
-        .folder-body { padding: 10px; }
-        
-        .contact-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px; }
-        .contact-name { font-size: 24px; font-weight: 800; color: #334155; margin: 10px 0 8px 0; }
-        .contact-phone { font-size: 18px; font-weight: bold; text-decoration: none; display: inline-block; background: #f1f5f9; color: #334155; padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; }
-
-        /* DYNAMIC POPUP MODAL STYLES */
+        select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+        .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; background: #16a34a; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
         .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 99999; display: none; }
-        .modal-content { background: #fff; width: 90%; max-width: 400px; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); box-sizing: border-box; }
-        .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #1e293b; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: flex-end; }
-        .btn-modal-cancel { padding: 10px 15px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .btn-modal-save { padding: 10px 20px; background: #16a34a; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .folder-mode-container { display: flex; gap: 10px; margin-bottom: 12px; }
-        .btn-mode-toggle { flex: 1; padding: 8px; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; color: #64748b; }
-        .btn-mode-toggle.active { background: #334155; color: white; border-color: #334155; }
+        .modal-content { background: #fff; width: 90%; max-width: 400px; padding: 20px; border-radius: 12px; }
     </style>
 </head>
 <body>
 
-<div id="appSplashScreen" class="splash-screen" style="display: none;">
-    Welcome to IBO Smart Catalog
-</div>
-
-<!-- DYNAMIC POPUP MODAL -->
-<div id="folderModalOverlay" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-title">📂 Add Product to Folder</div>
-        
-        <div class="form-group" style="margin-bottom: 12px;">
-            <label>Quantity</label>
-            <input type="number" id="modalQtyInput" value="1" min="1">
-        </div>
-
-        <label style="display:block; font-weight:600; margin-bottom:6px; color:#475569; font-size:14px;">Folder Option</label>
-        <div class="folder-mode-container">
-            <button id="modeSelectBtn" class="btn-mode-toggle active" onclick="setFolderMode('SELECT')">Existing Folder</button>
-            <button id="modeCreateBtn" class="btn-mode-toggle" onclick="setFolderMode('CREATE')">Create New</button>
-        </div>
-
-        <!-- Box 1: Select Existing Folder -->
-        <div id="modalSelectBox" class="form-group">
-            <select id="modalFolderSelect"></select>
-        </div>
-
-        <!-- Box 2: Create New Folder -->
-        <div id="modalCreateBox" class="form-group" style="display: none;">
-            <input type="text" id="modalNewFolderInput" placeholder="Enter new folder name (e.g., Rajan)">
-        </div>
-
-        <div class="modal-actions">
-            <button class="btn-modal-cancel" onclick="closeFolderModal()">Cancel</button>
-            <button class="btn-modal-save" onclick="submitFolderModalData()">Save Item</button>
-        </div>
-    </div>
-</div>
-
+<!-- ... (Keep your existing HTML structure until Admin Tab) ... -->
 <div class="app-container">
-    <div class="app-header">
-        <img src="1000227258.jpg" alt="IBO Logo" onerror="this.style.display='none';">
-        <div class="app-header-title">IBO Smart Catalog</div>
-    </div>
-    
+    <div class="app-header"><div class="app-header-title">IBO Smart Catalog</div></div>
     <div class="tab-bar">
         <button class="tab-btn active" onclick="switchTab('search-tab', this)">🔍 Search</button>
-        <button class="tab-btn" onclick="switchTab('folder-tab', this)">📂 Folder (<span id="cartCountBadge">0</span>)</button>
-        <button class="tab-btn" onclick="switchTab('admin-tab', this)">⚙️ Admin Control</button>
-        <button class="tab-btn" onclick="switchTab('info-tab', this)">📞 Contact</button>
+        <button class="tab-btn" onclick="switchTab('folder-tab', this)">📂 Folder</button>
+        <button class="tab-btn" onclick="switchTab('admin-tab', this)">⚙️ Admin</button>
     </div>
 
-    <!-- TAB 1: SEARCH ENGINE -->
-    <div id="search-tab" class="tab-content active">
-        <button class="btn-clear-all" onclick="resetEverythingMaster()">🔄 Reset All Filters</button>
-        <div class="form-group"><label>Category</label><select id="category" onchange="handleDropdownChange()"><option value="">-- All Categories --</option></select></div>
-        <div class="form-group"><label>Class</label><select id="class" onchange="handleDropdownChange()"><option value="">-- All Classes --</option></select></div>
-        <div class="form-group"><label>Sub Class</label><select id="subclass" onchange="handleDropdownChange()"><option value="">-- All Sub Classes --</option></select></div>
-        <div class="form-group"><label>Brand</label><select id="brand" onchange="handleDropdownChange()"><option value="">-- All Brands --</option></select></div>
-
-        <button class="btn-primary" onclick="triggerFilterSubmit()">🔍 Show Results</button>
-        
-        <div class="result-section" id="resultSection" style="display:none;">
-            <div class="form-group">
-                <label style="font-weight:bold;">🎯 Smart Search Current List</label>
-                <div class="filter-row-search">
-                    <input type="text" id="masterSearchInput" placeholder="Type words...">
-                    <button class="btn-search-trigger" onclick="handleMasterSearch()">🔍</button>
-                </div>
-            </div>
-            <div style="font-weight:bold; color:#334155; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
-            <div id="multipleResultsContainer"></div>
-        </div>
-    </div>
-
-    <!-- TAB 2: EXPORT MULTI-FOLDERS -->
-    <div id="folder-tab" class="tab-content">
-        <h3 style="margin-top:0; color:#1e293b;">📂 Saved Folders (Private)</h3>
-        <div id="multiFolderContainer"></div>
-        <button class="btn-primary" style="background:#ef4444; margin-top:20px;" onclick="clearAllFoldersMaster()">🚨 Delete All Folders Completely</button>
-    </div>
-
-    <!-- TAB 3: ADMIN CONTROL MANAGEMENT -->
     <div id="admin-tab" class="tab-content">
         <div id="adminLockScreen">
             <h3 style="margin-top:0;">🔒 Admin Authentication</h3>
-            <div class="form-group"><input type="password" id="adminPasswordInput" placeholder="Enter Admin Password..."></div>
+            <div class="form-group"><input type="password" id="adminPasswordInput" placeholder="Enter Password..."></div>
             <button class="btn-primary" onclick="checkAdminPassword()">Verify & Unlock</button>
         </div>
         <div id="adminContentPanel" style="display:none;">
-            <div class="data-counter" id="totalItemsCounter">Loading Pool Count...</div>
-            <input type="file" id="csvFileInput" accept=".csv" style="margin-top:10px;">
-            <div style="margin-top:12px; display:flex; gap:8px;">
-                <button class="btn-primary" style="background:#ef4444; margin:0;" onclick="processBulkUpload(true)">💥 Bulk Replace</button>
-                <button class="btn-primary" style="background:#16a34a; margin:0;" onclick="processBulkUpload(false)">➕ Append Reports</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 4: CONTACT -->
-    <div id="info-tab" class="tab-content">
-        <div class="contact-box">
-            <div class="contact-name">Raja</div>
-            <a href="tel:+918072613468" class="contact-phone">📞 +91 8072613468</a>
+            <div class="data-counter" id="totalItemsCounter">Stock Ready</div>
+            <h4>➕ Add Product</h4>
+            <select id="aCat" onchange="filterAdminClass()"><option value="">Category</option></select>
+            <select id="aCls" onchange="filterAdminSub()"><option value="">Class</option></select>
+            <select id="aSub" onchange="filterAdminBrand()"><option value="">Sub Class</option></select>
+            <select id="aBrand"><option value="">Brand</option></select>
+            <input type="text" id="addId" placeholder="Offer ID" style="margin-top:10px;">
+            <input type="text" id="addName" placeholder="Product Name" style="margin-top:10px;">
+            <button class="btn-primary" onclick="addSingleProduct()">Save Product</button>
         </div>
     </div>
 </div>
 
-<div class="toast" id="toastBox">Copied!</div>
-
 <script>
-let catalogData = [];
-let activeFilteredMatches = [];
-
-// SECURE LOCAL STORAGE FOR PRIVATE DATA PER PHONE
-let folderDatabase = JSON.parse(localStorage.getItem("ibo_folders")) || {}; 
-// MEMORY TO HOLD THE LAST SELECTED FOLDER NAME AS DEFAULT
-let lastSelectedFolder = localStorage.getItem("ibo_last_folder") || ""; 
-let currentTargetProductId = "";
-let currentFolderMode = "SELECT"; // SELECT or CREATE
-
-function triggerSplashScreen() {
-    let splash = document.getElementById("appSplashScreen");
-    splash.style.display = "flex"; splash.style.opacity = "1";
-    setTimeout(() => {
-        splash.style.opacity = "0";
-        setTimeout(() => splash.style.display = "none", 400);
-    }, 2000);
+// --- ADMIN DYNAMIC LOGIC ---
+function initAdminAddForm() {
+    let cats = [...new Set(catalogData.map(i => i.cat))];
+    populateDropdown("aCat", cats, "Category");
 }
 
-document.addEventListener("visibilitychange", function() {
-    if (document.visibilityState === "visible") triggerSplashScreen();
-});
-
-function loadCentralCSV() {
-    fetch('IBO STOCK-1.csv')
-    .then(res => res.text())
-    .then(text => parseCSVTextData(text, false))
-    .catch(() => updateStockCounterDisplay());
+function filterAdminClass() {
+    let cat = document.getElementById("aCat").value;
+    let cls = [...new Set(catalogData.filter(i => i.cat === cat).map(i => i.cls))];
+    populateDropdown("aCls", cls, "Class");
 }
 
-function parseCSVTextData(text, isAppend) {
-    let lines = text.split(/\r?\n/);
-    let tempArray = [];
-    for(let i = 1; i < lines.length; i++) {
-        let line = lines[i].trim(); if(!line) continue;
-        let col = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        if(col.length >= 6) {
-            tempArray.push({
-                id: col[0].replace(/^"|"$/g, '').trim(),
-                cat: col[1].replace(/^"|"$/g, '').trim(),
-                cls: col[2].replace(/^"|"$/g, '').trim(),
-                sub: col[3].replace(/^"|"$/g, '').trim(),
-                brand: col[4].replace(/^"|"$/g, '').trim(),
-                name: col[5].replace(/^"|"$/g, '').trim()
-            });
-        }
-    }
-    catalogData = isAppend ? catalogData.concat(tempArray) : tempArray;
-    updateStockCounterDisplay();
-    populateAllDropdownsInitial();
+function filterAdminSub() {
+    let cat = document.getElementById("aCat").value;
+    let cls = document.getElementById("aCls").value;
+    let subs = [...new Set(catalogData.filter(i => i.cat === cat && i.cls === cls).map(i => i.sub))];
+    populateDropdown("aSub", subs, "Sub Class");
 }
 
-function updateStockCounterDisplay() {
-    let cnt = document.getElementById("totalItemsCounter");
-    if(cnt) cnt.innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
+function filterAdminBrand() {
+    let cat = document.getElementById("aCat").value;
+    let cls = document.getElementById("aCls").value;
+    let sub = document.getElementById("aSub").value;
+    let brands = [...new Set(catalogData.filter(i => i.cat === cat && i.cls === cls && i.sub === sub).map(i => i.brand))];
+    populateDropdown("aBrand", brands, "Brand");
 }
 
-function populateAllDropdownsInitial() {
-    populateSingleDropdown("category", [...new Set(catalogData.map(i => i.cat))], "Categories");
-    populateSingleDropdown("class", [...new Set(catalogData.map(i => i.cls))], "Classes");
-    populateSingleDropdown("subclass", [...new Set(catalogData.map(i => i.sub))], "Sub Classes");
-    populateSingleDropdown("brand", [...new Set(catalogData.map(i => i.brand))], "Brands");
-}
-
-function populateSingleDropdown(id, list, label) {
-    let select = document.getElementById(id); if(!select) return;
-    select.innerHTML = `<option value="">-- All ${label} --</option>`;
+function populateDropdown(id, list, label) {
+    let s = document.getElementById(id);
+    s.innerHTML = `<option value="">${label}</option>`;
     list.filter(Boolean).sort().forEach(v => {
         let opt = document.createElement("option"); opt.value = v; opt.innerText = v;
-        select.appendChild(opt);
+        s.appendChild(opt);
     });
 }
 
-function handleDropdownChange() {
-    let catVal = document.getElementById("category").value;
-    let clsVal = document.getElementById("class").value;
-    let subVal = document.getElementById("subclass").value;
-    let brdVal = document.getElementById("brand").value;
-    let matches = catalogData;
-    if(catVal) matches = matches.filter(i => i.cat === catVal);
-    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
-    if(subVal) matches = matches.filter(i => i.sub === subVal);
-    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    if(!catVal) populateSingleDropdown("category", [...new Set(matches.map(i => i.cat))], "Categories");
-    if(!clsVal) populateSingleDropdown("class", [...new Set(matches.map(i => i.cls))], "Classes");
-    if(!subVal) populateSingleDropdown("subclass", [...new Set(matches.map(i => i.sub))], "Sub Classes");
-    if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))], "Brands");
-}
-
-function triggerFilterSubmit() {
-    document.getElementById("masterSearchInput").value = "";
-    handleDropdownChange();
-    let catVal = document.getElementById("category").value;
-    let clsVal = document.getElementById("class").value;
-    let subVal = document.getElementById("subclass").value;
-    let brdVal = document.getElementById("brand").value;
-    let matches = catalogData;
-    if(catVal) matches = matches.filter(i => i.cat === catVal);
-    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
-    if(subVal) matches = matches.filter(i => i.sub === subVal);
-    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    activeFilteredMatches = matches;
-    document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${matches.length}`;
-    renderCatalogCards(activeFilteredMatches.slice(0, 100));
-    document.getElementById("resultSection").style.display = "block";
-}
-
-function handleMasterSearch() {
-    let rawQuery = document.getElementById("masterSearchInput").value.toLowerCase().trim();
-    let currentPool = activeFilteredMatches.length > 0 ? activeFilteredMatches : catalogData;
-    if(!rawQuery) { renderCatalogCards(currentPool.slice(0, 100)); return; }
-    let terms = rawQuery.split(/\s+/);
-    let filtered = currentPool.filter(i => {
-        let txt = (i.id + " " + i.name + " " + i.brand).toLowerCase();
-        return terms.every(t => txt.includes(t));
-    });
-    renderCatalogCards(filtered.slice(0, 100));
-}
-
-function renderCatalogCards(dataList) {
-    let container = document.getElementById("multipleResultsContainer"); container.innerHTML = "";
-    if(dataList.length > 0) {
-        dataList.forEach((match) => {
-            container.innerHTML += `
-                <div class="product-card">
-                    <div class="copy-tile" onclick="copyTextDirect('${match.id}', 'Offer ID')">
-                        <div><span class="tile-label">Offer ID</span><br><span class="tile-value">${match.id}</span></div><div class="copy-btn">📋 Copy</div>
-                    </div>
-                    <div class="copy-tile" onclick="copyTextDirect('${match.name}', 'Product Name')">
-                        <div><span class="tile-label">Product Name</span><br><span class="tile-value">${match.name}</span></div><div class="copy-btn">📋 Copy</div>
-                    </div>
-                    <button class="btn-add-cart" onclick="openFolderModal('${match.id}')">➕ Add to Folder</button>
-                </div>`;
-        });
-    } else { container.innerHTML = "<div style='text-align:center; font-size:13px;'>No products found.</div>"; }
-}
-
-// POPUP MODAL CONTROL LOGICS
-function openFolderModal(productId) {
-    currentTargetProductId = productId;
-    document.getElementById("modalQtyInput").value = "1";
-    document.getElementById("modalNewFolderInput").value = "";
-    
-    let selectEl = document.getElementById("modalFolderSelect");
-    selectEl.innerHTML = "";
-    
-    let keys = Object.keys(folderDatabase);
-    
-    if(keys.length === 0) {
-        // No old folders exist, force 'CREATE NEW' mode automatically
-        setFolderMode('CREATE');
-        document.getElementById("modeSelectBtn").style.display = "none"; 
-    } else {
-        document.getElementById("modeSelectBtn").style.display = "block";
-        // Populate existing options
-        keys.forEach(k => {
-            let opt = document.createElement("option");
-            opt.value = k;
-            opt.innerText = `📂 ${k}`;
-            if(k === lastSelectedFolder) opt.selected = true; // Auto-select last used folder!
-            selectEl.appendChild(opt);
-        });
-        setFolderMode('SELECT');
-    }
-    
-    document.getElementById("folderModalOverlay").style.display = "flex";
-}
-
-function closeFolderModal() {
-    document.getElementById("folderModalOverlay").style.display = "none";
-}
-
-function setFolderMode(mode) {
-    currentFolderMode = mode;
-    if(mode === 'SELECT') {
-        document.getElementById("modeSelectBtn").classList.add("active");
-        document.getElementById("modeCreateBtn").classList.remove("active");
-        document.getElementById("modalSelectBox").style.display = "block";
-        document.getElementById("modalCreateBox").style.display = "none";
-    } else {
-        document.getElementById("modeCreateBtn").classList.add("active");
-        document.getElementById("modeSelectBtn").classList.remove("active");
-        document.getElementById("modalSelectBox").style.display = "none";
-        document.getElementById("modalCreateBox").style.display = "block";
-    }
-}
-
-function submitFolderModalData() {
-    let qtyVal = parseInt(document.getElementById("modalQtyInput").value) || 1;
-    let finalFolderName = "";
-
-    if (currentFolderMode === "CREATE") {
-        let inputName = document.getElementById("modalNewFolderInput").value.trim();
-        if(!inputName) { alert("Folder name type pannunga brother!"); return; }
-        finalFolderName = inputName;
-    } else {
-        finalFolderName = document.getElementById("modalFolderSelect").value;
-        if(!finalFolderName) { alert("Folder yethum select seiyapadavillai!"); return; }
-    }
-
-    // Save target tracking name inside memory device
-    lastSelectedFolder = finalFolderName;
-    localStorage.setItem("ibo_last_folder", lastSelectedFolder);
-
-    if (!folderDatabase[finalFolderName]) {
-        folderDatabase[finalFolderName] = [];
-    }
-
-    let pItem = catalogData.find(i => i.id === currentTargetProductId);
-    let duplicateIndex = folderDatabase[finalFolderName].findIndex(x => x.id === currentTargetProductId);
-    
-    if(duplicateIndex > -1) {
-        folderDatabase[finalFolderName][duplicateIndex].qty += qtyVal;
-    } else {
-        folderDatabase[finalFolderName].push({ id: pItem.id, name: pItem.name, qty: qtyVal });
-    }
-
-    localStorage.setItem("ibo_folders", JSON.stringify(folderDatabase));
-    
-    updateFoldersUI();
-    closeFolderModal();
-    showToast(`Added to Folder: ${finalFolderName}! ✔️`);
-}
-
-function updateFoldersUI() {
-    let container = document.getElementById("multiFolderContainer");
-    container.innerHTML = "";
-    let keys = Object.keys(folderDatabase);
-    
-    let totalItems = 0;
-    keys.forEach(k => totalItems += folderDatabase[k].length);
-    document.getElementById("cartCountBadge").innerText = totalItems;
-
-    if(keys.length === 0) {
-        container.innerHTML = "<p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>No folders built yet.</p>";
-        return;
-    }
-
-    keys.forEach(fName => {
-        let itemsList = folderDatabase[fName];
-        let rowItemsHTML = "";
-        
-        itemsList.forEach((item, index) => {
-            rowItemsHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:13px;">
-                    <div style="max-width:70%;"><strong>${item.id}</strong> - ${item.name}</div>
-                    <div>
-                        <span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-weight:bold;">Qty: ${item.qty}</span>
-                        <span style="color:#ef4444; margin-left:10px; cursor:pointer; font-weight:bold;" onclick="removeSingleItemFromFolder('${fName}', ${index})">❌</span>
-                    </div>
-                </div>`;
-        });
-
-        container.innerHTML += `
-            <div class="folder-block">
-                <div class="folder-header">
-                    <span>📂 ${fName} (${itemsList.length})</span>
-                    <div style="display:flex; gap:8px;">
-                        <button onclick="exportSingleFolderCSV('${fName}')" style="padding:4px 8px; font-size:11px; font-weight:bold; background:#16a34a; color:white; border:none; border-radius:4px; cursor:pointer;">📊 Export</button>
-                        <button onclick="deleteEntireFolderGroup('${fName}')" style="padding:4px 8px; font-size:11px; font-weight:bold; background:#ef4444; color:white; border:none; border-radius:4px; cursor:pointer;">🗑️ Delete</button>
-                    </div>
-                </div>
-                <div class="folder-body">
-                    ${rowItemsHTML || "<p style='color:#94a3b8; margin:0; font-size:12px;'>Folder is empty</p>"}
-                </div>
-            </div>`;
-    });
-}
-
-function removeSingleItemFromFolder(folderName, index) {
-    folderDatabase[folderName].splice(index, 1);
-    localStorage.setItem("ibo_folders", JSON.stringify(folderDatabase));
-    updateFoldersUI();
-}
-
-function deleteEntireFolderGroup(folderName) {
-    if(confirm(`Are you sure you want to delete folder: ${folderName}?`)) {
-        delete folderDatabase[folderName];
-        if(lastSelectedFolder === folderName) {
-            lastSelectedFolder = "";
-            localStorage.removeItem("ibo_last_folder");
-        }
-        localStorage.setItem("ibo_folders", JSON.stringify(folderDatabase));
-        updateFoldersUI();
-        showToast("Folder Removed!");
-    }
-}
-
-function clearAllFoldersMaster() {
-    if(confirm("Full setup structures dynamic folders templates-ah unga mobile phone memory la irunthu absolute ah clear panni remove panna poringala?")) {
-        folderDatabase = {};
-        lastSelectedFolder = "";
-        localStorage.removeItem("ibo_folders");
-        localStorage.removeItem("ibo_last_folder");
-        updateFoldersUI();
-        showToast("Everything Reset Cleanly!");
-    }
-}
-
-function exportSingleFolderCSV(folderName) {
-    let list = folderDatabase[folderName];
-    if(!list || list.length === 0) return;
-    let csvContent = "data:text/csv;charset=utf-8,Offer ID,Product Name,Quantity\n";
-    list.forEach(i => { csvContent += `"${i.id}","${i.name.replace(/"/g, '""')}",${i.qty}\n`; });
-    let link = document.createElement("a");
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `${folderName}_Report.csv`);
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+function addSingleProduct() {
+    let newProd = {
+        id: document.getElementById("addId").value,
+        cat: document.getElementById("aCat").value,
+        cls: document.getElementById("aCls").value,
+        sub: document.getElementById("aSub").value,
+        brand: document.getElementById("aBrand").value,
+        name: document.getElementById("addName").value
+    };
+    catalogData.push(newProd);
+    alert("Saved Successfully!");
 }
 
 function checkAdminPassword() {
     if(document.getElementById("adminPasswordInput").value === "raja123") {
         document.getElementById("adminLockScreen").style.display = "none";
         document.getElementById("adminContentPanel").style.display = "block";
+        initAdminAddForm();
     } else { alert("Wrong Password!"); }
 }
 
-function processBulkUpload(isOverwrite) {
-    let fileInput = document.getElementById("csvFileInput");
-    if (!fileInput.files.length) return;
-    let reader = new FileReader();
-    reader.onload = function(e) { parseCSVTextData(e.target.result, !isOverwrite); };
-    reader.readAsText(fileInput.files[0]);
-}
-
-function resetEverythingMaster() {
-    document.getElementById("category").value = "";
-    document.getElementById("class").value = "";
-    document.getElementById("subclass").value = "";
-    document.getElementById("brand").value = "";
-    populateAllDropdownsInitial();
-    document.getElementById("resultSection").style.display = "none";
-}
-
-function switchTab(tabId, btn) {
-    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).style.display = 'block';
-    if(btn) btn.classList.add('active');
-    if(tabId === 'folder-tab') updateFoldersUI();
-}
-
-function copyTextDirect(text, label) { navigator.clipboard.writeText(text).then(() => showToast(label + " Copied!")); }
-function showToast(msg) { let t = document.getElementById("toastBox"); t.innerText = msg; t.style.display = "block"; setTimeout(() => t.style.display="none", 2000); }
-
-window.onload = function() { 
-    loadCentralCSV(); 
-    triggerSplashScreen();
-    updateFoldersUI();
-};
+// ... (Rest of your existing functions like switchTab, loadCentralCSV, etc.)
 </script>
 </body>
 </html>
