@@ -8,12 +8,12 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
         
-        /* HEADER STYLING - IBO RED ONLY FOR BRAND NAME */
-        .app-header { background: #ffffff; color: #b91c1c; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border-bottom: 2px solid #f1f5f9; }
+        /* HEADER: RED BACKGROUND WITH WHITE NAME AND LOGO IMAGE PLACEHOLDER */
+        .app-header { background: #b91c1c; color: #ffffff; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border-bottom: 2px solid #a21a1a; }
         .app-header img { height: 48px; width: auto; max-width: 160px; border-radius: 4px; object-fit: contain; }
-        .app-header-title { font-size: 22px; font-weight: 800; letter-spacing: 0.3px; color: #b91c1c; }
+        .app-header-title { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; }
         
-        /* PREMIUM SLATE TAB BAR */
+        /* SLATE CORPORATE TAB BAR */
         .tab-bar { display: flex; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
         .tab-btn { flex: 1; padding: 14px 10px; border: none; background: none; font-weight: 600; cursor: pointer; color: #64748b; font-size: 13px; white-space: nowrap; transition: all 0.2s ease; }
         .tab-btn.active { background: #ffffff; color: #334155; border-bottom: 3px solid #334155; }
@@ -25,7 +25,7 @@
         select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; color: #1e293b; transition: border 0.2s; }
         select:focus, input:focus { border-color: #334155; box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1); }
         
-        /* CLEAN CORPORATE BLUE BUTTONS */
+        /* SLATE/BLUE CONTROL BUTTONS */
         .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 18px; text-transform: uppercase; }
         .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; transition: background 0.2s; }
         .btn-primary:active { background: #1e293b; }
@@ -37,14 +37,13 @@
         .result-section { margin-top: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
         .product-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         
-        /* COPY TILES ACCENT */
-        .copy-tile { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .copy-tile { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .copy-tile:hover { background: #f1f5f9; }
         .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
         .tile-value { font-size: 14px; font-weight: bold; color: #1e293b; margin-top: 2px; }
         .copy-btn { font-size: 11px; color: #475569; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
         
-        /* EXCLUSIVE GREEN FOR TOTAL STOCK AVAILABILITY */
+        /* EXCLUSIVE STOCK COUNTER - GREEN */
         .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 20px; background: #16a34a; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(22, 163, 74, 0.2); letter-spacing: 0.3px; }
         
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
@@ -110,7 +109,7 @@
         <button class="btn-primary" style="background:#ef4444; margin-top:10px;" onclick="clearFolder()">🚨 Clear Full Folder</button>
     </div>
 
-    <!-- TAB 3: ADMIN CONTROL MANAGEMENT WITH LOCK SYSTEM -->
+    <!-- TAB 3: ADMIN CONTROL MANAGEMENT -->
     <div id="admin-tab" class="tab-content">
         <div id="adminLockScreen" class="lock-screen">
             <h3 style="margin-top:0; color:#1e293b;">🔒 Admin Authentication</h3>
@@ -127,7 +126,6 @@
                 <button onclick="lockAdminPanel()" style="padding:5px 10px; background:#64748b; color:white; border:none; border-radius:4px; font-size:11px; cursor:pointer;">🔒 Lock</button>
             </div>
             
-            <!-- EXCLUSIVE GREEN STOCK TRACKER DISPLAY -->
             <div class="data-counter" id="totalItemsCounter">Loading Data Pool Count...</div>
             
             <div class="admin-section" style="margin-bottom: 20px;">
@@ -334,7 +332,6 @@ function checkAdminPassword() {
 function lockAdminPanel() {
     document.getElementById("adminContentPanel").style.display = "none";
     document.getElementById("adminLockScreen").style.display = "block";
-    showToast("Panel Locked! 🔒");
 }
 
 function resetEverythingMaster() {
@@ -392,7 +389,7 @@ function addSingleProductManual() {
     let brand = document.getElementById("newBrand").value.trim();
     
     if(!id || !name || !cat || !cls || !sub || !brand) { 
-        alert("🚨 Upload Error!\nCategory, Class, Sub Class, Brand, Offer ID, and Product Name kandiba fill panni irukanum! Edhuvum empty ah eruka koodadhu."); 
+        alert("🚨 Upload Error!\nCategory, Class, Sub Class, Brand, Offer ID, and Product Name must fill panni irukanum!"); 
         return; 
     }
     
@@ -481,6 +478,11 @@ function exportFolderToCSV() {
 }
 
 function switchTab(tabId, btn) {
+    // SECURITY AUTO-LOCK: Triggered immediately if moving away from Admin tab
+    if (tabId !== 'admin-tab') {
+        lockAdminPanel();
+    }
+    
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).style.display = 'block';
