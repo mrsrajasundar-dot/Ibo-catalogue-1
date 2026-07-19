@@ -15,12 +15,14 @@
         .tab-content.active { display: block; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #374151; font-size: 14px; }
-        select, input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; }
-        .btn-primary { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .filter-row { display: flex; gap: 8px; align-items: center; }
+        select, input { flex: 1; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; }
+        .btn-clear { padding: 12px 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .btn-primary { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; }
         .btn-primary:active { background: #0369a1; }
         .btn-success { width: 100%; padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-success:active { background: #15803d; }
-        .result-section { margin-top: 20px; background: #f0f9ff; border: 1px dashed #0284c7; border-radius: 10px; padding: 15px; }
+        .result-section { margin-top: 15px; background: #f0f9ff; border: 1px dashed #0284c7; border-radius: 10px; padding: 15px; }
         .product-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .copy-tile { background: #f8fafc; border: 1px solid #e2e2e2; border-radius: 6px; padding: 8px; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
@@ -58,34 +60,48 @@
         </div>
         
         <div id="filterFieldsForm" style="display:none;">
-            <!-- MASTER SEARCH BOX -->
-            <div class="form-group">
-                <label style="color:#0284c7;">🎯 Master Search (Offer ID / Product Name)</label>
-                <input type="text" id="masterSearchInput" placeholder="Type Offer ID or Name here..." oninput="handleMasterSearch()">
-            </div>
-
-            <div style="text-align: center; font-size: 12px; color: #64748b; margin: 10px 0;">— OR USE DROPDOWNS SEPARATELY —</div>
-
-            <!-- CASCADING INDEPENDENT FILTERS -->
+            <!-- Dropdown Filter Section -->
             <div class="form-group">
                 <label>Category</label>
-                <select id="category" onchange="handleDropdownChange('cat')"><option value="">-- All Categories --</option></select>
+                <div class="filter-row">
+                    <select id="category" onchange="handleDropdownChange('cat')"><option value="">-- All Categories --</option></select>
+                    <button class="btn-clear" onclick="clearSingleFilter('category')">❌ Clear</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>Class</label>
-                <select id="class" onchange="handleDropdownChange('cls')"><option value="">-- All Classes --</option></select>
+                <div class="filter-row">
+                    <select id="class" onchange="handleDropdownChange('cls')"><option value="">-- All Classes --</option></select>
+                    <button class="btn-clear" onclick="clearSingleFilter('class')">❌ Clear</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>Sub Class</label>
-                <select id="subclass" onchange="handleDropdownChange('sub')"><option value="">-- All Sub Classes --</option></select>
+                <div class="filter-row">
+                    <select id="subclass" onchange="handleDropdownChange('sub')"><option value="">-- All Sub Classes --</option></select>
+                    <button class="btn-clear" onclick="clearSingleFilter('subclass')">❌ Clear</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>Brand</label>
-                <select id="brand" onchange="handleDropdownChange('brand')"><option value="">-- All Brands --</option></select>
+                <div class="filter-row">
+                    <select id="brand" onchange="handleDropdownChange('brand')"><option value="">-- All Brands --</option></select>
+                    <button class="btn-clear" onclick="clearSingleFilter('brand')">❌ Clear</button>
+                </div>
             </div>
+
+            <!-- Anti-Lag Process Trigger -->
+            <button class="btn-primary" onclick="triggerFilterSubmit()">🔍 Show Results</button>
             
+            <!-- RESULTS VIEW WITH SEARCH BOX ON TOP -->
             <div class="result-section" id="resultSection" style="display:none;">
-                <div style="font-weight:bold; color:#0369a1; margin-bottom:12px;">🎯 Results Found:</div>
+                <!-- MASTER SEARCH BOX PLACED EXACTLY ABOVE RESULTS -->
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="color:#0284c7; font-size:13px;">🎯 Filter current results (Offer ID / Name)</label>
+                    <input type="text" id="masterSearchInput" placeholder="Type keywords to filter list below..." oninput="handleMasterSearch()">
+                </div>
+
+                <div style="font-weight:bold; color:#0369a1; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
                 <div id="multipleResultsContainer"></div>
             </div>
         </div>
@@ -118,6 +134,7 @@
 
 <script>
 let catalogData = [];
+let activeFilteredMatches = [];
 let exportFolder = [];
 
 function loadCentralCSV() {
@@ -128,7 +145,7 @@ function loadCentralCSV() {
     })
     .then(text => parseCSVTextData(text))
     .catch(error => {
-        document.getElementById("totalItemsCounter").innerHTML = `🚨 Error: IBO STOCK-1.csv File missing in GitHub folder!`;
+        document.getElementById("totalItemsCounter").innerHTML = `🚨 Error: IBO STOCK-1.csv missing!`;
     });
 }
 
@@ -174,7 +191,8 @@ function populateAllDropdownsInitial() {
 function populateSingleDropdown(id, list) {
     let select = document.getElementById(id);
     let currentVal = select.value;
-    select.innerHTML = `<option value="">-- All ${id.charAt(0).toUpperCase() + id.slice(1)}s --</option>`;
+    let label = id === "subclass" ? "Sub Classes" : id.charAt(0).toUpperCase() + id.slice(1) + "s";
+    select.innerHTML = `<option value="">-- All ${label} --</option>`;
     list.filter(Boolean).sort().forEach(v => {
         let opt = document.createElement("option");
         opt.value = v; opt.innerText = v;
@@ -183,21 +201,7 @@ function populateSingleDropdown(id, list) {
     });
 }
 
-function handleMasterSearch() {
-    let query = document.getElementById("masterSearchInput").value.toLowerCase().trim();
-    if(!query) {
-        document.getElementById("resultSection").style.display = "none";
-        return;
-    }
-    resetDropdownSelectionsExcept("");
-    
-    let matches = catalogData.filter(item => item.id.toLowerCase().includes(query) || item.name.toLowerCase().includes(query));
-    renderCatalogCards(matches.slice(0, 150));
-}
-
 function handleDropdownChange(triggeredFilter) {
-    document.getElementById("masterSearchInput").value = "";
-    
     let catVal = document.getElementById("category").value;
     let clsVal = document.getElementById("class").value;
     let subVal = document.getElementById("subclass").value;
@@ -213,8 +217,43 @@ function handleDropdownChange(triggeredFilter) {
     if(!clsVal) populateSingleDropdown("class", [...new Set(matches.map(i => i.cls))]);
     if(!subVal) populateSingleDropdown("subclass", [...new Set(matches.map(i => i.sub))]);
     if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))]);
+}
+
+function clearSingleFilter(id) {
+    document.getElementById(id).value = "";
+    handleDropdownChange('');
+    showToast("Filter cleared");
+}
+
+function triggerFilterSubmit() {
+    document.getElementById("masterSearchInput").value = "";
+    let catVal = document.getElementById("category").value;
+    let clsVal = document.getElementById("class").value;
+    let subVal = document.getElementById("subclass").value;
+    let brdVal = document.getElementById("brand").value;
     
-    renderCatalogCards(matches);
+    let matches = catalogData;
+    if(catVal) matches = matches.filter(i => i.cat === catVal);
+    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
+    if(subVal) matches = matches.filter(i => i.sub === subVal);
+    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
+    
+    activeFilteredMatches = matches;
+    document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${matches.length}`;
+    renderCatalogCards(activeFilteredMatches.slice(0, 100));
+    document.getElementById("resultSection").style.display = "block";
+}
+
+function handleMasterSearch() {
+    let query = document.getElementById("masterSearchInput").value.toLowerCase().trim();
+    if(!query) {
+        renderCatalogCards(activeFilteredMatches.slice(0, 100));
+        document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${activeFilteredMatches.length}`;
+        return;
+    }
+    let textFiltered = activeFilteredMatches.filter(item => item.id.toLowerCase().includes(query) || item.name.toLowerCase().includes(query));
+    document.getElementById("resultCountLabel").innerText = `🎯 Filtered Matches: ${textFiltered.length}`;
+    renderCatalogCards(textFiltered.slice(0, 100));
 }
 
 function renderCatalogCards(dataList) {
@@ -236,29 +275,25 @@ function renderCatalogCards(dataList) {
                     <div class="cart-controls">
                         <div><span style="font-size:12px; font-weight:600; color:#475569;">Qty:</span>
                         <input type="number" class="qty-input" id="qty_${match.id}" value="1" min="1"></div>
-                        <button class="btn-add-cart" onclick="addToExportFolder('${match.id}')">➕ Add to Export Folder</button>
+                        <button class="btn-add-cart" onclick="addToExportFolder('${match.id}')">➕ Add to Folder</button>
                     </div>
                 </div>
             `;
         });
-        document.getElementById("resultSection").style.display = "block";
     } else {
-        container.innerHTML = "<div style='text-align:center; font-size:13px; color:#64748b; padding:10px;'>No matching records found.</div>";
-        document.getElementById("resultSection").style.display = "block";
+        container.innerHTML = "<div style='text-align:center; font-size:13px; color:#64748b; padding:10px;'>No results matched.</div>";
     }
 }
 
 function addToExportFolder(id) {
     let item = catalogData.find(i => i.id === id);
     let qtyVal = parseInt(document.getElementById(`qty_${id}`).value) || 1;
-    
     let existingIndex = exportFolder.findIndex(i => i.id === id);
     if(existingIndex > -1) {
         exportFolder[existingIndex].qty += qtyVal;
     } else {
         exportFolder.push({ id: item.id, name: item.name, qty: qtyVal });
     }
-    
     updateCartUI();
     showToast("Added to Export Folder! ✔️");
 }
@@ -267,20 +302,16 @@ function updateCartUI() {
     document.getElementById("cartCountBadge").innerText = exportFolder.length;
     let container = document.getElementById("cartItemsContainer");
     let btnExcel = document.getElementById("btnExportExcel");
-    
     container.innerHTML = "";
     if(exportFolder.length === 0) {
         container.innerHTML = "<p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>Folder is empty.</p>";
         btnExcel.style.display = "none";
         return;
     }
-    
     exportFolder.forEach((item, index) => {
         container.innerHTML += `
             <div class="cart-item-row">
-                <div style="max-width: 70%;">
-                    <strong>${item.id}</strong> - <span style="color:#475569;">${item.name}</span>
-                </div>
+                <div style="max-width: 70%;"><strong>${item.id}</strong> - <span style="color:#475569;">${item.name}</span></div>
                 <div>
                     <span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-weight:bold;">Qty: ${item.qty}</span>
                     <span style="color:#ef4444; font-weight:bold; margin-left:10px; cursor:pointer;" onclick="removeFromFolder(${index})">❌</span>
@@ -304,15 +335,12 @@ function clearFolder() {
 
 function exportFolderToCSV() {
     if(exportFolder.length === 0) return;
-    
     let csvContent = "data:text/csv;charset=utf-8,";
     csvContent += "Offer ID,Product Name,Quantity\n";
-    
     exportFolder.forEach(item => {
         let cleanName = item.name.replace(/"/g, '""');
         csvContent += `"${item.id}","${cleanName}",${item.qty}\n`;
     });
-    
     let encodedUri = encodeURI(csvContent);
     let link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -320,13 +348,6 @@ function exportFolderToCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-}
-
-function resetDropdownSelectionsExcept(id) {
-    if(id !== 'cat') document.getElementById("category").value = "";
-    if(id !== 'cls') document.getElementById("class").value = "";
-    if(id !== 'sub') document.getElementById("subclass").value = "";
-    if(id !== 'brand') document.getElementById("brand").value = "";
 }
 
 function switchTab(tabId, btn) {
