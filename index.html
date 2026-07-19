@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Catalog Bulk Pro</title>
+    <title>Smart Catalog Pro DB</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e5e7eb; }
@@ -18,6 +18,9 @@
         select, input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; }
         .btn-primary { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-primary:active { background: #0369a1; }
+        .btn-success { width: 100%; padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-success:active { background: #15803d; }
+        .btn-danger { width: 100%; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 25px; }
         .result-section { margin-top: 20px; background: #f0f9ff; border: 1px dashed #0284c7; border-radius: 10px; padding: 15px; }
         .product-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .copy-tile { background: #f8fafc; border: 1px solid #e2e2e2; border-radius: 6px; padding: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -25,26 +28,25 @@
         .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
         .tile-value { font-size: 14px; font-weight: bold; color: #0f172a; }
         .copy-btn { font-size: 11px; color: #0284c7; font-weight: bold; background: #e0f2fe; padding: 3px 6px; border-radius: 4px; }
-        .fav-list-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-bottom: 8px; font-size: 13px; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; }
         .info-note { font-size: 12px; color: #0369a1; margin-bottom: 15px; line-height: 1.4; background: #e0f2fe; padding: 10px; border-radius: 6px; border: 1px solid #bae6fd; }
-        .data-counter { text-align: center; font-size: 12px; color: #64748b; font-weight: bold; margin-bottom: 10px; }
+        .data-counter { text-align: center; font-size: 13px; color: #1e293b; font-weight: bold; margin-bottom: 10px; background: #f1f5f9; padding: 8px; border-radius: 6px; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; }
+        .section-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-top: 10px; margin-bottom: 5px; border-left: 4px solid #0284c7; padding-left: 8px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="app-header">Smart Catalog Bulk Pro</div>
+    <div class="app-header">Smart Catalog Pro DB</div>
     
     <div class="tab-bar">
         <button class="tab-btn active" onclick="switchTab('search-tab', this)">🔍 Search</button>
-        <button class="tab-btn" onclick="switchTab('add-tab', this)">📥 Bulk Upload</button>
-        <button class="tab-btn" onclick="switchTab('fav-tab', this)">⭐ Favorites</button>
+        <button class="tab-btn" onclick="switchTab('add-tab', this)">📥 Manage Storage</button>
     </div>
 
-    <!-- TAB 1: SEARCH LOOKUP -->
+    <!-- TAB 1: SEARCH -->
     <div id="search-tab" class="tab-content active">
-        <div class="data-counter" id="totalItemsCounter">No data loaded yet. Please upload CSV!</div>
+        <div class="data-counter" id="totalItemsCounter">Loading Permanent DB...</div>
         <div class="form-group">
             <label>1. Category</label>
             <select id="category" onchange="updateClass()"><option value="">-- Select --</option></select>
@@ -68,45 +70,83 @@
         </div>
     </div>
 
-    <!-- TAB 2: BULK UPLOAD -->
+    <!-- TAB 2: MANAGE STORAGE -->
     <div id="add-tab" class="tab-content">
-        <h3 style="margin-top:0; color:#0f172a;">📊 Bulk CSV Upload</h3>
+        <div class="section-title">📊 Bulk File Upload Options</div>
         <div class="info-note">
-            💡 <b>File Guidelines:</b><br>
-            Unga kitta irukura <b>`IBO STOCK-1.csv`</b> file-ah direct-ah phone storage-la irundhu select panni load pannikonga.
+            💡 Unga CSV file-ah select pannittu, ungaluku yetha input option-ah click pannunga.
         </div>
         
-        <div class="form-group" style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 10px; text-align: center;">
-            <label style="margin-bottom: 10px; color:#475569;">Select CSV File From Phone</label>
+        <div class="form-group" style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 10px; text-align: center;">
             <input type="file" id="csvFileInput" accept=".csv" style="padding:5px;">
         </div>
         
-        <button class="btn-primary" onclick="handleBulkUpload()">⚡ Process & Import Data</button>
+        <!-- OPTION 1: CLEAR AND ONE-TIME FRESH UPLOAD -->
+        <button class="btn-primary" onclick="handleBulkUpload(true)">🔄 Option A: One-Time Fresh Upload (Old Data Clear Aagum)</button>
         
-        <div id="uploadStatus" style="margin-top:15px; font-size:13px; color:#16a34a; font-weight:bold; text-align:center;"></div>
-    </div>
-
-    <!-- TAB 3: FAVORITES -->
-    <div id="fav-tab" class="tab-content">
-        <h3>⭐ Saved Favorites List</h3>
-        <div id="favoritesList">--- No items saved yet ---</div>
-        <button class="btn-primary" style="background:#16a34a; margin-top:15px;" onclick="exportFavorites()">📥 Export Favorites to CSV</button>
+        <!-- OPTION 2: APPEND / BULK UPDATE NEW DATA -->
+        <button class="btn-success" onclick="handleBulkUpload(false)">➕ Option B: Add New Bulk Data (Old Data-voda Add Aagum)</button>
+        
+        <div id="uploadStatus" style="margin-top:12px; font-size:13px; color:#16a34a; font-weight:bold; text-align:center;"></div>
+        
+        <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 25px 0;">
+        
+        <div class="section-title">➕ Add Single New Product</div>
+        <div class="info-note">💡 Edhavadhu oru single item mattum manually text box vazhiya permanent database-kulla insert panna:</div>
+        
+        <div class="form-group"><label>Offer ID</label><input type="text" id="newId" placeholder="e.g. 1017818199"></div>
+        <div class="form-group"><label>Category Name</label><input type="text" id="newCat" placeholder="e.g. Hardware"></div>
+        <div class="form-group"><label>Class</label><input type="text" id="newCls" placeholder="e.g. Door Hardware"></div>
+        <div class="form-group"><label>Subclass</label><input type="text" id="newSub" placeholder="e.g. Door Hinge"></div>
+        <div class="form-group"><label>Brand</label><input type="text" id="newBrand" placeholder="e.g. Victor"></div>
+        <div class="form-group"><label>Product Name</label><input type="text" id="newName" placeholder="e.g. Brass Door Hinge 6 inch"></div>
+        
+        <button class="btn-success" onclick="handleSingleAdd()">➕ Save Single Entry</button>
+        
+        <button class="btn-danger" onclick="clearFullDatabase()">🚨 Delete All Storage Data</button>
     </div>
 </div>
 
 <div class="toast" id="toastBox">Saved!</div>
 
 <script>
-// Empty data array waiting for user CSV import
+let db;
 let catalogData = [];
-let favorites = [];
 
 function initApp() {
+    let request = indexedDB.open("SmartCatalogDB", 1);
+    request.onupgradeneeded = function(e) {
+        let database = e.target.result;
+        if (!database.objectStoreNames.contains("products")) {
+            database.createObjectStore("products", { keyPath: "id" });
+        }
+    };
+    request.onsuccess = function(e) {
+        db = e.target.result;
+        loadDataFromStorage();
+    };
+    request.onerror = function() {
+        alert("Database error!");
+    };
+}
+
+function loadDataFromStorage() {
+    let transaction = db.transaction(["products"], "readonly");
+    let store = transaction.objectStore("products");
+    let getAllRequest = store.getAll();
+    
+    getAllRequest.onsuccess = function() {
+        catalogData = getAllRequest.result;
+        refreshDropdownFilters();
+    };
+}
+
+function refreshDropdownFilters() {
     let counter = document.getElementById("totalItemsCounter");
     if(catalogData.length === 0) {
-        counter.innerText = "No data loaded yet. Please upload CSV!";
+        counter.innerText = "📁 Database Empty! Please upload a CSV File.";
     } else {
-        counter.innerText = `📦 Total Catalog Items: ${catalogData.length}`;
+        counter.innerText = `📦 Permanent Phone Storage: ${catalogData.length} Items`;
     }
     
     let catSelect = document.getElementById("category");
@@ -114,19 +154,22 @@ function initApp() {
     let uniqueCats = [...new Set(catalogData.map(item => item.cat))].filter(Boolean);
     uniqueCats.forEach(c => {
         let opt = document.createElement("option"); 
-        opt.value = c; 
-        opt.innerText = c; 
+        opt.value = c; opt.innerText = c; 
         catSelect.appendChild(opt);
     });
 }
 
-function handleBulkUpload() {
+// Master Smart Bulk Upload (Handles both Reset and Append)
+function handleBulkUpload(isClearFirst) {
     let fileInput = document.getElementById("csvFileInput");
     let statusDiv = document.getElementById("uploadStatus");
     
-    if (fileInput.files.length === 0) {
-        alert("Dhayavu seidhu oru CSV file-ah select pannunga!");
-        return;
+    if (fileInput.files.length === 0) { alert("Dhayavu seidhu CSV file select pannunga!"); return; }
+    
+    if (isClearFirst) {
+        if(!confirm("Option A selected: Intha upload pazhaya data-va poora azhichidum. Proceed seiyyalama?")) return;
+    } else {
+        if(!confirm("Option B selected: Intha dynamic upload unga puthiya data-va existing data-voda bulk ah add pannum. Proceed seiyyalama?")) return;
     }
     
     let file = fileInput.files[0];
@@ -135,27 +178,28 @@ function handleBulkUpload() {
     reader.onload = function(e) {
         let text = e.target.result;
         let lines = text.split(/\r?\n/);
-        let addedCount = 0;
-        catalogData = []; // clear old items if any
         
-        // Starting loop from row 1, ignoring binary headers if format contains any
+        let transaction = db.transaction(["products"], "readwrite");
+        let store = transaction.objectStore("products");
+        
+        if(isClearFirst) {
+            store.clear(); // Clear database if One-Time Clean mode is selected
+        }
+        
         let headerIndex = -1;
         for(let i = 0; i < Math.min(lines.length, 10); i++) {
             if(lines[i].includes("offerid") || lines[i].includes("offer") || lines[i].includes("category")) {
-                headerIndex = i;
-                break;
+                headerIndex = i; break;
             }
         }
-        
         let startIndex = headerIndex !== -1 ? headerIndex + 1 : 1;
+        let itemsSaved = 0;
         
         for(let i = startIndex; i < lines.length; i++) {
             let line = lines[i].trim();
             if(!line) continue;
             
-            // Standard smart splitting by comma
             let columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            
             if(columns.length >= 6) {
                 let id = columns[0].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
                 let cat = columns[1].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
@@ -164,26 +208,60 @@ function handleBulkUpload() {
                 let brand = columns[4].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
                 let name = columns[5].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
                 
-                // Ensure valid data entry logic
                 if(id && name && !id.includes("IBO") && !id.includes("offer")) {
-                    catalogData.push({ id, cat, cls, sub, brand, name });
-                    addedCount++;
+                    store.put({ id, cat, cls, sub, brand, name });
+                    itemsSaved++;
                 }
             }
         }
         
-        statusDiv.innerText = `✅ Success! ${addedCount} products loaded into memory.`;
-        showToast("Bulk Data Sync Complete!");
-        initApp(); 
-        fileInput.value = ""; 
-        switchTab('search-tab', document.getElementsByClassName('tab-btn')[0]);
+        transaction.oncomplete = function() {
+            statusDiv.innerText = `✅ Processed! ${itemsSaved} items handled successfully.`;
+            showToast("Bulk Database Updated!");
+            loadDataFromStorage();
+            fileInput.value = "";
+        };
     };
-    
-    reader.onerror = function() {
-        alert("File padikurathula error varuthu!");
-    };
-    
     reader.readAsText(file);
+}
+
+function handleSingleAdd() {
+    let id = document.getElementById("newId").value.trim();
+    let cat = document.getElementById("newCat").value.trim();
+    let cls = document.getElementById("newCls").value.trim();
+    let sub = document.getElementById("newSub").value.trim();
+    let brand = document.getElementById("newBrand").value.trim();
+    let name = document.getElementById("newName").value.trim();
+    
+    if(!id || !name || !cat) { alert("Offer ID, Category and Product Name kandippa venum!"); return; }
+    
+    let transaction = db.transaction(["products"], "readwrite");
+    let store = transaction.objectStore("products");
+    
+    store.put({ id, cat, cls, sub, brand, name });
+    
+    transaction.oncomplete = function() {
+        showToast("Single Entry Saved! ⭐");
+        document.getElementById("newId").value = "";
+        document.getElementById("newCat").value = "";
+        document.getElementById("newCls").value = "";
+        document.getElementById("newSub").value = "";
+        document.getElementById("newBrand").value = "";
+        document.getElementById("newName").value = "";
+        loadDataFromStorage();
+    };
+}
+
+function clearFullDatabase() {
+    if(confirm("Kandippa ella storage data-vaiyum delete seiyyalama?")) {
+        let transaction = db.transaction(["products"], "readwrite");
+        let store = transaction.objectStore("products");
+        store.clear();
+        transaction.oncomplete = function() {
+            alert("Storage full-ah clear aiyiduchu!");
+            loadDataFromStorage();
+        };
+    }
 }
 
 function updateClass() {
@@ -243,7 +321,6 @@ function showMultipleResults() {
                         <div><span class="tile-label">Product Name</span><br><span class="tile-value">${match.name}</span></div>
                         <div class="copy-btn">📋 Copy</div>
                     </div>
-                    <button class="btn-primary" style="background:#eab308; padding: 6px; font-size:12px; margin-top:8px;" onclick="addSpecificToFavorites(${JSON.stringify(match).replace(/"/g, '&quot;')})">⭐ Add to Favorites</button>
                 </div>
             `;
         });
@@ -251,35 +328,6 @@ function showMultipleResults() {
     } else {
         container.innerHTML = "No items found.";
     }
-}
-
-function addSpecificToFavorites(item) {
-    if(!favorites.some(f => f.id === item.id)) {
-        favorites.push(item);
-        showToast("Favorites-la Add Seyyappattathu! ⭐");
-        renderFavorites();
-    }
-}
-
-function renderFavorites() {
-    let container = document.getElementById("favoritesList");
-    if(favorites.length === 0) { container.innerHTML = "--- No items saved yet ---"; return; }
-    container.innerHTML = "";
-    favorites.forEach(item => {
-        container.innerHTML += `<div class="fav-list-item"><b>ID:</b> ${item.id} <br> <b>Name:</b> ${item.name}</div>`;
-    });
-}
-
-function exportFavorites() {
-    if(favorites.length === 0) { alert("Favorites list empty-ah irukku!"); return; }
-    let csvContent = "data:text/csv;charset=utf-8,Offer ID,Product Name\n" + favorites.map(e => `"${e.id}","${e.name}"`).join("\n");
-    let encodedUri = encodeURI(csvContent);
-    let link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "favorite_offers.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
 
 function populateDropdown(id, list) {
