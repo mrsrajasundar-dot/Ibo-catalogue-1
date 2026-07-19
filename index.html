@@ -32,6 +32,8 @@
         .data-counter { text-align: center; font-size: 13px; color: #1e293b; font-weight: bold; margin-bottom: 10px; background: #f1f5f9; padding: 8px; border-radius: 6px; }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; }
         .section-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-top: 10px; margin-bottom: 5px; border-left: 4px solid #0284c7; padding-left: 8px; }
+        .search-filter-box { margin-bottom: 15px; border: 2px solid #0284c7 !important; }
+        .password-container { padding: 30px 20px; text-align: center; }
     </style>
 </head>
 <body>
@@ -65,45 +67,59 @@
         </div>
         
         <div class="result-section" id="resultSection" style="display:none;">
-            <div style="font-weight:bold; color:#0369a1; margin-bottom:12px;">🎯 Matching Offers Found:</div>
+            <div style="font-weight:bold; color:#0284c7; margin-bottom:10px;">🔍 Filter Results by Product Name:</div>
+            <input type="text" id="resultNameFilter" class="search-filter-box" placeholder="Type name here to search within results..." oninput="filterCurrentResults()">
+            
+            <div style="font-weight:bold; color:#0369a1; margin-bottom:12px; margin-top:10px;">🎯 Matching Offers:</div>
             <div id="multipleResultsContainer"></div>
         </div>
     </div>
 
-    <!-- TAB 2: MANAGE STORAGE -->
+    <!-- TAB 2: MANAGE STORAGE (WITH PASSWORD PROTECTION) -->
     <div id="add-tab" class="tab-content">
-        <div class="section-title">📊 Bulk File Upload Options</div>
-        <div class="info-note">
-            💡 Unga CSV file-ah select pannittu, ungaluku yetha input option-ah click pannunga.
+        <!-- Password Lock View -->
+        <div id="passwordLockScreen" class="password-container">
+            <h3 style="margin-top:0; color:#ef4444;">🔒 Admin Authentication Required</h3>
+            <p style="font-size:13px; color:#64748b;">Storage-ah manage seiyya admin password ullaedukkavum.</p>
+            <div class="form-group">
+                <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password">
+            </div>
+            <button class="btn-primary" onclick="verifyAdminPassword()">Unlock Management</button>
         </div>
-        
-        <div class="form-group" style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 10px; text-align: center;">
-            <input type="file" id="csvFileInput" accept=".csv" style="padding:5px;">
+
+        <!-- Main Protected Management Content -->
+        <div id="protectedStorageContent" style="display: none;">
+            <div class="section-title">📊 Bulk File Upload Options</div>
+            <div class="info-note">
+                💡 Unga CSV file-ah select pannittu, ungaluku yetha input option-ah click pannunga.
+            </div>
+            
+            <div class="form-group" style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 10px; text-align: center;">
+                <input type="file" id="csvFileInput" accept=".csv" style="padding:5px;">
+            </div>
+            
+            <button class="btn-primary" onclick="handleBulkUpload(true)">🔄 Option A: One-Time Fresh Upload (Old Data Clear Aagum)</button>
+            <button class="btn-success" onclick="handleBulkUpload(false)">➕ Option B: Add New Bulk Data (Old Data-voda Add Aagum)</button>
+            
+            <div id="uploadStatus" style="margin-top:12px; font-size:13px; color:#16a34a; font-weight:bold; text-align:center;"></div>
+            
+            <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 25px 0;">
+            
+            <div class="section-title">➕ Add Single New Product</div>
+            <div class="info-note">💡 Edhavadhu oru single item manually database-kulla insert panna:</div>
+            
+            <div class="form-group"><label>Offer ID</label><input type="text" id="newId" placeholder="e.g. 1017818199"></div>
+            <div class="form-group"><label>Category Name</label><input type="text" id="newCat" placeholder="e.g. Hardware"></div>
+            <div class="form-group"><label>Class</label><input type="text" id="newCls" placeholder="e.g. Door Hardware"></div>
+            <div class="form-group"><label>Subclass</label><input type="text" id="newSub" placeholder="e.g. Door Hinge"></div>
+            <div class="form-group"><label>Brand</label><input type="text" id="newBrand" placeholder="e.g. Victor"></div>
+            <div class="form-group"><label>Product Name</label><input type="text" id="newName" placeholder="e.g. Brass Door Hinge 6 inch"></div>
+            
+            <button class="btn-success" onclick="handleSingleAdd()">➕ Save Single Entry</button>
+            
+            <button class="btn-danger" onclick="clearFullDatabase()">🚨 Delete All Storage Data</button>
+            <button class="btn-primary" style="background:#64748b; margin-top:15px;" onclick="lockStorageAgain()">🔒 Lock Settings Again</button>
         </div>
-        
-        <!-- OPTION 1: CLEAR AND ONE-TIME FRESH UPLOAD -->
-        <button class="btn-primary" onclick="handleBulkUpload(true)">🔄 Option A: One-Time Fresh Upload (Old Data Clear Aagum)</button>
-        
-        <!-- OPTION 2: APPEND / BULK UPDATE NEW DATA -->
-        <button class="btn-success" onclick="handleBulkUpload(false)">➕ Option B: Add New Bulk Data (Old Data-voda Add Aagum)</button>
-        
-        <div id="uploadStatus" style="margin-top:12px; font-size:13px; color:#16a34a; font-weight:bold; text-align:center;"></div>
-        
-        <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 25px 0;">
-        
-        <div class="section-title">➕ Add Single New Product</div>
-        <div class="info-note">💡 Edhavadhu oru single item mattum manually text box vazhiya permanent database-kulla insert panna:</div>
-        
-        <div class="form-group"><label>Offer ID</label><input type="text" id="newId" placeholder="e.g. 1017818199"></div>
-        <div class="form-group"><label>Category Name</label><input type="text" id="newCat" placeholder="e.g. Hardware"></div>
-        <div class="form-group"><label>Class</label><input type="text" id="newCls" placeholder="e.g. Door Hardware"></div>
-        <div class="form-group"><label>Subclass</label><input type="text" id="newSub" placeholder="e.g. Door Hinge"></div>
-        <div class="form-group"><label>Brand</label><input type="text" id="newBrand" placeholder="e.g. Victor"></div>
-        <div class="form-group"><label>Product Name</label><input type="text" id="newName" placeholder="e.g. Brass Door Hinge 6 inch"></div>
-        
-        <button class="btn-success" onclick="handleSingleAdd()">➕ Save Single Entry</button>
-        
-        <button class="btn-danger" onclick="clearFullDatabase()">🚨 Delete All Storage Data</button>
     </div>
 </div>
 
@@ -112,6 +128,8 @@
 <script>
 let db;
 let catalogData = [];
+let currentlyFilteredMatches = [];
+const ADMIN_KEY = "admin123"; // INTHA PASSWORD THAAN ENGINE LOCK KEY! Change if required.
 
 function initApp() {
     let request = indexedDB.open("SmartCatalogDB", 1);
@@ -159,18 +177,31 @@ function refreshDropdownFilters() {
     });
 }
 
-// Master Smart Bulk Upload (Handles both Reset and Append)
+// Admin Lock Verification
+function verifyAdminPassword() {
+    let inputPass = document.getElementById("adminPasswordInput").value.trim();
+    if(inputPass === ADMIN_KEY) {
+        document.getElementById("passwordLockScreen").style.display = "none";
+        document.getElementById("protectedStorageContent").style.display = "block";
+        document.getElementById("adminPasswordInput").value = "";
+        showToast("Access Granted! Unlock Successful.");
+    } else {
+        alert("Thappana Password! Admin access மறுக்கப்பட்டது.");
+    }
+}
+
+function lockStorageAgain() {
+    document.getElementById("protectedStorageContent").style.display = "none";
+    document.getElementById("passwordLockScreen").style.display = "block";
+    showToast("Locked Successfully!");
+}
+
+// Master Bulk Upload Engine
 function handleBulkUpload(isClearFirst) {
     let fileInput = document.getElementById("csvFileInput");
     let statusDiv = document.getElementById("uploadStatus");
     
     if (fileInput.files.length === 0) { alert("Dhayavu seidhu CSV file select pannunga!"); return; }
-    
-    if (isClearFirst) {
-        if(!confirm("Option A selected: Intha upload pazhaya data-va poora azhichidum. Proceed seiyyalama?")) return;
-    } else {
-        if(!confirm("Option B selected: Intha dynamic upload unga puthiya data-va existing data-voda bulk ah add pannum. Proceed seiyyalama?")) return;
-    }
     
     let file = fileInput.files[0];
     let reader = new FileReader();
@@ -182,9 +213,7 @@ function handleBulkUpload(isClearFirst) {
         let transaction = db.transaction(["products"], "readwrite");
         let store = transaction.objectStore("products");
         
-        if(isClearFirst) {
-            store.clear(); // Clear database if One-Time Clean mode is selected
-        }
+        if(isClearFirst) { store.clear(); }
         
         let headerIndex = -1;
         for(let i = 0; i < Math.min(lines.length, 10); i++) {
@@ -237,7 +266,6 @@ function handleSingleAdd() {
     
     let transaction = db.transaction(["products"], "readwrite");
     let store = transaction.objectStore("products");
-    
     store.put({ id, cat, cls, sub, brand, name });
     
     transaction.oncomplete = function() {
@@ -303,14 +331,28 @@ function showMultipleResults() {
     let subVal = document.getElementById("subclass").value;
     let brdVal = document.getElementById("brand").value;
     
+    document.getElementById("resultNameFilter").value = ""; // Clear existing text filter
+    
+    if(!brdVal) { document.getElementById("resultSection").style.display = "none"; return; }
+    currentlyFilteredMatches = catalogData.filter(item => item.cat === catVal && item.cls === clsVal && item.sub === subVal && item.brand === brdVal);
+    
+    renderResultCards(currentlyFilteredMatches);
+    document.getElementById("resultSection").style.display = "block";
+}
+
+// Live Result Text Filter Logic
+function filterCurrentResults() {
+    let query = document.getElementById("resultNameFilter").value.toLowerCase().trim();
+    let filtered = currentlyFilteredMatches.filter(item => item.name.toLowerCase().includes(query) || item.id.toLowerCase().includes(query));
+    renderResultCards(filtered);
+}
+
+function renderResultCards(dataList) {
     let container = document.getElementById("multipleResultsContainer");
     container.innerHTML = "";
     
-    if(!brdVal) { document.getElementById("resultSection").style.display = "none"; return; }
-    let matches = catalogData.filter(item => item.cat === catVal && item.cls === clsVal && item.sub === subVal && item.brand === brdVal);
-    
-    if(matches.length > 0) {
-        matches.forEach((match) => {
+    if(dataList.length > 0) {
+        dataList.forEach((match) => {
             container.innerHTML += `
                 <div class="product-card">
                     <div class="copy-tile" onclick="copyTextDirect('${match.id}', 'Offer ID')">
@@ -324,9 +366,8 @@ function showMultipleResults() {
                 </div>
             `;
         });
-        document.getElementById("resultSection").style.display = "block";
     } else {
-        container.innerHTML = "No items found.";
+        container.innerHTML = "<div style='text-align:center; color:#64748b; font-size:13px; padding:10px;'>No matching products found inside this specific tier.</div>";
     }
 }
 
@@ -346,6 +387,12 @@ function switchTab(tabId, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).style.display = 'block';
     if(btn) btn.classList.add('active');
+    
+    // Automatically reset password screen view when switching back to prevent session cache stay
+    if(tabId !== 'add-tab') {
+        document.getElementById("protectedStorageContent").style.display = "none";
+        document.getElementById("passwordLockScreen").style.display = "block";
+    }
 }
 
 function copyTextDirect(text, label) {
