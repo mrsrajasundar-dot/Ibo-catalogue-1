@@ -5,50 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IBO Smart Catalog</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e5e7eb; }
-        .app-header { background: #b91c1c; color: white; padding: 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-        .app-header img { height: 45px; width: auto; max-width: 150px; border-radius: 4px; object-fit: contain; }
-        .app-header-title { font-size: 20px; font-weight: bold; letter-spacing: 0.5px; }
-        .tab-bar { display: flex; background: #e2e8f0; border-bottom: 1px solid #cbd5e1; overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 600; cursor: pointer; color: #475569; font-size: 13px; white-space: nowrap; }
-        .tab-btn.active { background: #ffffff; color: #b91c1c; border-bottom: 3px solid #b91c1c; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+        
+        /* HEADER STYLING - IBO RED ONLY FOR BRAND NAME */
+        .app-header { background: #ffffff; color: #b91c1c; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border-bottom: 2px solid #f1f5f9; }
+        .app-header img { height: 48px; width: auto; max-width: 160px; border-radius: 4px; object-fit: contain; }
+        .app-header-title { font-size: 22px; font-weight: 800; letter-spacing: 0.3px; color: #b91c1c; }
+        
+        /* PREMIUM SLATE TAB BAR */
+        .tab-bar { display: flex; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 14px 10px; border: none; background: none; font-weight: 600; cursor: pointer; color: #64748b; font-size: 13px; white-space: nowrap; transition: all 0.2s ease; }
+        .tab-btn.active { background: #ffffff; color: #334155; border-bottom: 3px solid #334155; }
+        
         .tab-content { padding: 20px; display: none; }
         .tab-content.active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #374151; font-size: 14px; }
-        select, input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; }
-        select:focus, input:focus { border-color: #b91c1c; }
-        .btn-clear-all { width: 100%; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 15px; text-transform: uppercase; }
-        .btn-primary { width: 100%; padding: 12px; background: #b91c1c; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; }
-        .btn-primary:active { background: #991b1b; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #475569; font-size: 14px; }
+        select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; color: #1e293b; transition: border 0.2s; }
+        select:focus, input:focus { border-color: #334155; box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1); }
+        
+        /* CLEAN CORPORATE BLUE BUTTONS */
+        .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 18px; text-transform: uppercase; }
+        .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; transition: background 0.2s; }
+        .btn-primary:active { background: #1e293b; }
+        
         .filter-row-search { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
-        .btn-search-trigger { padding: 12px 18px; background: #b91c1c; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .btn-success { width: 100%; padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .result-section { margin-top: 15px; background: #fef2f2; border: 1px dashed #b91c1c; border-radius: 10px; padding: 15px; }
-        .product-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .copy-tile { background: #f8fafc; border: 1px solid #e2e2e2; border-radius: 6px; padding: 8px; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
-        .tile-value { font-size: 14px; font-weight: bold; color: #0f172a; }
-        .copy-btn { font-size: 11px; color: #b91c1c; font-weight: bold; background: #ffeeee; padding: 3px 6px; border-radius: 4px; }
-        .data-counter { text-align: center; font-size: 13px; color: #ffffff; font-weight: bold; margin-bottom: 15px; background: #b91c1c; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; }
-        .admin-section { background: #fafafa; border: 2px dashed #94a3b8; padding: 15px; border-radius: 10px; margin-top: 10px; }
-        .cart-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
-        .qty-input { width: 70px; padding: 5px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; }
-        .btn-add-cart { padding: 6px 12px; background: #16a34a; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .contact-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px; }
-        .contact-title { font-size: 15px; font-weight: bold; color: #475569; text-transform: uppercase; }
-        .contact-name { font-size: 24px; font-weight: 800; color: #b91c1c; margin: 10px 0 5px 0; }
-        .contact-phone { font-size: 20px; font-weight: bold; color: #1e293b; text-decoration: none; display: inline-block; margin-top: 5px; background: #ffeeee; color: #b91c1c; padding: 8px 15px; border-radius: 8px; }
-        .lock-screen { text-align: center; padding: 30px 10px; }
+        .btn-search-trigger { padding: 12px 18px; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn-success { width: 100%; padding: 13px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        .result-section { margin-top: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
+        .product-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        
+        /* COPY TILES ACCENT */
+        .copy-tile { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .copy-tile:hover { background: #f1f5f9; }
+        .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .tile-value { font-size: 14px; font-weight: bold; color: #1e293b; margin-top: 2px; }
+        .copy-btn { font-size: 11px; color: #475569; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
+        
+        /* EXCLUSIVE GREEN FOR TOTAL STOCK AVAILABILITY */
+        .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 20px; background: #16a34a; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(22, 163, 74, 0.2); letter-spacing: 0.3px; }
+        
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .admin-section { background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 12px; margin-top: 10px; }
+        
+        .cart-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .qty-input { width: 65px; padding: 6px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; }
+        .btn-add-cart { padding: 8px 14px; background: #16a34a; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        
+        .contact-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px; }
+        .contact-title { font-size: 14px; font-weight: bold; color: #64748b; text-transform: uppercase; }
+        .contact-name { font-size: 24px; font-weight: 800; color: #334155; margin: 10px 0 8px 0; }
+        .contact-phone { font-size: 18px; font-weight: bold; text-decoration: none; display: inline-block; background: #f1f5f9; color: #334155; padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .lock-screen { text-align: center; padding: 35px 15px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="app-header">
-        <!-- Replace 'ibo-logo.jpg' with your repository logo image file path -->
         <img src="1000227258.jpg" alt="IBO Logo" onerror="this.style.display='none';">
         <div class="app-header-title">IBO Smart Catalog</div>
     </div>
@@ -74,13 +90,13 @@
             
             <div class="result-section" id="resultSection" style="display:none;">
                 <div class="form-group">
-                    <label style="color:#b91c1c; font-size:14px; font-weight:bold;">🎯 Smart Search Current List</label>
+                    <label style="color:#334155; font-size:14px; font-weight:bold;">🎯 Smart Search Current List</label>
                     <div class="filter-row-search">
                         <input type="text" id="masterSearchInput" placeholder="Type words (e.g., 90m FR 1.5)...">
                         <button class="btn-search-trigger" onclick="handleMasterSearch()">🔍</button>
                     </div>
                 </div>
-                <div style="font-weight:bold; color:#b91c1c; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
+                <div style="font-weight:bold; color:#334155; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
                 <div id="multipleResultsContainer"></div>
             </div>
         </div>
@@ -88,7 +104,7 @@
 
     <!-- TAB 2: EXPORT FOLDER -->
     <div id="folder-tab" class="tab-content">
-        <h3 style="margin-top:0; color:#0f172a;">📂 Saved Folder Items</h3>
+        <h3 style="margin-top:0; color:#1e293b;">📂 Saved Folder Items</h3>
         <div id="cartItemsContainer"><p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>Folder is empty.</p></div>
         <button class="btn-success" id="btnExportExcel" onclick="exportFolderToCSV()" style="display:none;">📊 Export Folder to Excel</button>
         <button class="btn-primary" style="background:#ef4444; margin-top:10px;" onclick="clearFolder()">🚨 Clear Full Folder</button>
@@ -96,7 +112,6 @@
 
     <!-- TAB 3: ADMIN CONTROL MANAGEMENT WITH LOCK SYSTEM -->
     <div id="admin-tab" class="tab-content">
-        <!-- Password UI Screen -->
         <div id="adminLockScreen" class="lock-screen">
             <h3 style="margin-top:0; color:#1e293b;">🔒 Admin Authentication</h3>
             <p style="font-size:13px; color:#64748b;">Intha panel access seiya password enter seiyavum.</p>
@@ -106,23 +121,20 @@
             <button class="btn-primary" onclick="checkAdminPassword()">Verify & Unlock</button>
         </div>
 
-        <!-- Authenticated Operations Panel -->
         <div id="adminContentPanel" style="display:none;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:8px; margin-bottom:15px;">
-                <h3 style="margin:0; color:#0f172a;">⚙️ Admin Control Panel</h3>
-                <button onclick="lockAdminPanel()" style="padding:4px 8px; background:#64748b; color:white; border:none; border-radius:4px; font-size:11px; cursor:pointer;">🔒 Lock</button>
+                <h3 style="margin:0; color:#1e293b;">⚙️ Admin Control Panel</h3>
+                <button onclick="lockAdminPanel()" style="padding:5px 10px; background:#64748b; color:white; border:none; border-radius:4px; font-size:11px; cursor:pointer;">🔒 Lock</button>
             </div>
             
-            <!-- TOTAL STOCK COUNTER MOVED HERE -->
+            <!-- EXCLUSIVE GREEN STOCK TRACKER DISPLAY -->
             <div class="data-counter" id="totalItemsCounter">Loading Data Pool Count...</div>
             
-            <!-- BLOCK A: SINGLE PRODUCT INSERTION -->
             <div class="admin-section" style="margin-bottom: 20px;">
-                <h4 style="margin:0 0 10px 0; color:#b91c1c;">➕ Add Single Product</h4>
+                <h4 style="margin:0 0 10px 0; color:#334155;">➕ Add Single Product</h4>
                 <div class="form-group"><label>Offer ID *</label><input type="text" id="newOfferId" placeholder="Ex: 5002931"></div>
                 <div class="form-group"><label>Product Name *</label><input type="text" id="newProdName" placeholder="Ex: Polycab Wire 1.5 sq mm"></div>
                 
-                <!-- DEPENDENT DROPDOWNS -->
                 <div class="form-group">
                     <label>Category *</label>
                     <select id="newCat" onchange="handleAdminDropdownChange('cat')"><option value="">-- Select Category --</option></select>
@@ -143,9 +155,8 @@
                 <button class="btn-success" style="width:100%; margin-top:5px;" onclick="addSingleProductManual()">Save New Product</button>
             </div>
 
-            <!-- BLOCK B: DATA FILE UPLOAD ENGINE WITH ERROR TRAILER -->
             <div class="admin-section">
-                <h4 style="margin:0 0 5px 0; color:#ea580c;">📥 Dynamic CSV File Upload</h4>
+                <h4 style="margin:0 0 5px 0; color:#334155;">📥 Dynamic CSV File Upload</h4>
                 <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Format mapping: offerid, category, class, subclass, brand, name</p>
                 
                 <div style="background:#fff; border:1px solid #cbd5e1; padding:10px; border-radius:8px;">
@@ -154,8 +165,8 @@
                 </div>
                 
                 <div style="margin-top:12px; display:flex; gap:8px;">
-                    <button class="btn-primary" style="background:#ef4444; margin:0; font-size:12px;" onclick="processBulkUpload(true)">💥 Bulk Replace (Overwrites All)</button>
-                    <button class="btn-primary" style="background:#16a34a; margin:0; font-size:12px;" onclick="processBulkUpload(false)">➕ Append Reports (Merge Items)</button>
+                    <button class="btn-primary" style="background:#ef4444; margin:0; font-size:12px;" onclick="processBulkUpload(true)">💥 Bulk Replace</button>
+                    <button class="btn-primary" style="background:#16a34a; margin:0; font-size:12px;" onclick="processBulkUpload(false)">➕ Append Reports</button>
                 </div>
             </div>
         </div>
@@ -195,7 +206,6 @@ function parseCSVTextData(text, isAppendMode) {
     let startIndex = headerIndex !== -1 ? headerIndex + 1 : 1;
     let tempArray = [];
     
-    // STRICT CSV CELL VALIDATION TRACKER
     for(let i = startIndex; i < lines.length; i++) {
         let line = lines[i].trim(); if(!line) continue;
         let columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -208,13 +218,11 @@ function parseCSVTextData(text, isAppendMode) {
             let brand = columns[4].replace(/^"|"$/g, '').trim();
             let name = columns[5].replace(/^"|"$/g, '').trim();
             
-            // Skip clean headers or pure template files
             if(id.includes("IBO") || id.includes("offer") || (!id && !name && !cat)) continue;
             
-            // ERROR DETECTOR FOR MISSING CELLS IN ANY REQUIRED COLUMN
             if(!id || !name || !cat || !cls || !sub || !brand) {
                 alert(`🚨 File Validation Error!\nRow ${i + 1} la category, class, subclass, brand, offerid, illa product name field fill aagama empty ah iruku! Please check details.`);
-                return; // Stop execution absolutely to avoid broken pool sync
+                return;
             }
             
             tempArray.push({ id, cat, cls, sub, brand, name });
@@ -240,7 +248,7 @@ function parseCSVTextData(text, isAppendMode) {
 function updateStockCounterDisplay() {
     let counter = document.getElementById("totalItemsCounter");
     if(counter) {
-        counter.innerText = `🔴 Total Available Stock Items: ${catalogData.length}`;
+        counter.innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
     }
 }
 
@@ -375,7 +383,6 @@ function handleMasterSearch() {
     renderCatalogCards(textFiltered.slice(0, 100));
 }
 
-// STRICT VALIDATION FOR SINGLE PRODUCT INSERTION
 function addSingleProductManual() {
     let id = document.getElementById("newOfferId").value.trim();
     let name = document.getElementById("newProdName").value.trim();
@@ -384,7 +391,6 @@ function addSingleProductManual() {
     let sub = document.getElementById("newSubClass").value.trim();
     let brand = document.getElementById("newBrand").value.trim();
     
-    // Check if any mandatory parameter field is missed or skipped
     if(!id || !name || !cat || !cls || !sub || !brand) { 
         alert("🚨 Upload Error!\nCategory, Class, Sub Class, Brand, Offer ID, and Product Name kandiba fill panni irukanum! Edhuvum empty ah eruka koodadhu."); 
         return; 
@@ -455,7 +461,7 @@ function updateCartUI() {
             <div style="display:flex; justify-content:between; align-items:center; padding:8px 0; border-bottom:1px solid #e2e8f0; font-size:13px;">
                 <div style="max-width:70%;"><strong>${item.id}</strong> - ${item.name}</div>
                 <div style="margin-left:auto;">
-                    <span style="background:#ffeeee; color:#b91c1c; padding:3px 8px; border-radius:4px; font-weight:bold;">Qty: ${item.qty}</span>
+                    <span style="background:#e2e8f0; color:#334155; padding:3px 8px; border-radius:4px; font-weight:bold;">Qty: ${item.qty}</span>
                     <span style="color:#ef4444; font-weight:bold; margin-left:10px; cursor:pointer;" onclick="removeFromFolder(${index})">❌</span>
                 </div>
             </div>`;
