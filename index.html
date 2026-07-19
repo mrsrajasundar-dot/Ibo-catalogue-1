@@ -5,10 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IBO Smart Catalog</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; position: relative; min-height: 95vh; }
+        .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; display: none; }
         
-        /* HEADER: RED BACKGROUND WITH WHITE NAME AND LOGO IMAGE PLACEHOLDER */
+        /* DYNAMIC LOADING SPLASH SCREEN */
+        .splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; }
+        .splash-logo { width: 180px; height: auto; max-height: 80px; object-fit: contain; margin-bottom: 20px; animation: pulse 1.8s infinite ease-in-out; }
+        .splash-text { font-size: 24px; font-weight: 800; color: #b91c1c; text-align: center; margin: 5px 20px; font-family: 'Segoe UI', sans-serif; letter-spacing: 0.5px; }
+        .splash-sub { font-size: 14px; color: #64748b; margin-top: 8px; font-weight: 500; }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.98); opacity: 0.85; }
+            50% { transform: scale(1.03); opacity: 1; }
+            100% { transform: scale(0.98); opacity: 0.85; }
+        }
+
+        /* HEADER: RED BACKGROUND WITH WHITE NAME AND LOGO IMAGE */
         .app-header { background: #b91c1c; color: #ffffff; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border-bottom: 2px solid #a21a1a; }
         .app-header img { height: 48px; width: auto; max-width: 160px; border-radius: 4px; object-fit: contain; }
         .app-header-title { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; }
@@ -40,14 +52,14 @@
         .copy-tile { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .copy-tile:hover { background: #f1f5f9; }
         .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        .tile-value { font-size: 14px; font-weight: bold; color: #1e293b; margin-top: 2px; }
+        .tile-value font-size: 14px; font-weight: bold; color: #1e293b; margin-top: 2px; }
         .copy-btn { font-size: 11px; color: #475569; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
         
         /* EXCLUSIVE STOCK COUNTER - GREEN */
         .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 10px; background: #16a34a; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(22, 163, 74, 0.2); letter-spacing: 0.3px; }
         .btn-download-server { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
         
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .admin-section { background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 12px; margin-top: 10px; }
         
         /* FORMAT REFERENCE BOX */
@@ -70,7 +82,14 @@
 </head>
 <body>
 
-<div class="app-container">
+<!-- WELCOME INTRO SPLASH SCREEN -->
+<div id="splashScreen" class="splash-screen">
+    <img src="1000227258.jpg" alt="IBO Logo" class="splash-logo" onerror="this.src='https://via.placeholder.com/150?text=IBO+LOGO';">
+    <div class="splash-text">Welcome to IBO Smart Catalog</div>
+    <div class="splash-sub">Loading catalog engine...</div>
+</div>
+
+<div class="app-container" id="mainAppContainer">
     <div class="app-header">
         <img src="1000227258.jpg" alt="IBO Logo" onerror="this.style.display='none';">
         <div class="app-header-title">IBO Smart Catalog</div>
@@ -165,7 +184,6 @@
             <div class="admin-section">
                 <h4 style="margin:0 0 5px 0; color:#334155;">📥 Dynamic CSV File Upload</h4>
                 
-                <!-- NEW FORMAT INSTRUCTION & DOWNLOAD SAMPLE BOARD -->
                 <div class="format-reference-box">
                     ⚠️ <strong>Excel / CSV Upload Format Guideline:</strong><br>
                     Upload panra sheet exact ah intha structural header order la thaan irukanum. Map guidelines clear ah code panna keela irukira sample template use pannikonga:<br>
@@ -209,8 +227,26 @@ const ADMIN_PASSWORD = "raja123";
 function loadCentralCSV() {
     fetch('IBO STOCK-1.csv')
     .then(response => { if (!response.ok) throw new Error(); return response.text(); })
-    .then(text => parseCSVTextData(text, false))
-    .catch(() => { updateStockCounterDisplay(); });
+    .then(text => {
+        parseCSVTextData(text, false);
+        hideSplashScreen(); // Close splash once data loaded successfully
+    })
+    .catch(() => { 
+        updateStockCounterDisplay();
+        setTimeout(hideSplashScreen, 2500); // Fail-safe fallback timeout
+    });
+}
+
+function hideSplashScreen() {
+    let splash = document.getElementById("splashScreen");
+    let app = document.getElementById("mainAppContainer");
+    if(splash && splash.style.display !== "none") {
+        splash.style.opacity = 0;
+        setTimeout(() => {
+            splash.style.display = "none";
+            app.style.display = "block";
+        }, 500); // Smooth fade transition delay
+    }
 }
 
 function parseCSVTextData(text, isAppendMode) {
@@ -237,7 +273,7 @@ function parseCSVTextData(text, isAppendMode) {
             if(id.toLowerCase().includes("ibo") || id.toLowerCase().includes("offer") || (!id && !name && !cat)) continue;
             
             if(!id || !name || !cat || !cls || !sub || !brand) {
-                alert(`🚨 File Validation Error!\nRow ${i + 1} la category, class, subclass, brand, offerid, illa product name field fill aagama empty ah iruku! Please check details.`);
+                alert(`🚨 File Validation Error!\nRow ${i + 1} la category, class, subclass, brand, offerid, or product name field fill aagama empty ah iruku! Please check details.`);
                 return;
             }
             
