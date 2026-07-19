@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Catalog Bulk Pro</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e5e7eb; }
+        .app-header { background: #0284c7; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; }
+        .tab-bar { display: flex; background: #e2e8f0; border-bottom: 1px solid #cbd5e1; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 600; cursor: pointer; color: #475569; font-size: 13px; }
+        .tab-btn.active { background: #ffffff; color: #0284c7; border-bottom: 3px solid #0284c7; }
+        .tab-content { padding: 20px; display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #374151; font-size: 14px; }
+        select, input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; }
+        .btn-primary { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-primary:active { background: #0369a1; }
+        .result-section { margin-top: 20px; background: #f0f9ff; border: 1px dashed #0284c7; border-radius: 10px; padding: 15px; }
+        .product-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .copy-tile { background: #f8fafc; border: 1px solid #e2e2e2; border-radius: 6px; padding: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .copy-tile:active { background: #e2e8f0; }
+        .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
+        .tile-value { font-size: 14px; font-weight: bold; color: #0f172a; }
+        .copy-btn { font-size: 11px; color: #0284c7; font-weight: bold; background: #e0f2fe; padding: 3px 6px; border-radius: 4px; }
+        .fav-list-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-bottom: 8px; font-size: 13px; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; }
+        .info-note { font-size: 12px; color: #0369a1; margin-bottom: 15px; line-height: 1.4; background: #e0f2fe; padding: 10px; border-radius: 6px; border: 1px solid #bae6fd; }
+        .data-counter { text-align: center; font-size: 12px; color: #64748b; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="app-header">Smart Catalog Bulk Pro</div>
+    
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('search-tab', this)">🔍 Search</button>
+        <button class="tab-btn" onclick="switchTab('add-tab', this)">📥 Bulk Upload</button>
+        <button class="tab-btn" onclick="switchTab('fav-tab', this)">⭐ Favorites</button>
+    </div>
+
+    <!-- TAB 1: SEARCH LOOKUP -->
+    <div id="search-tab" class="tab-content active">
+        <div class="data-counter" id="totalItemsCounter">No data loaded yet. Please upload CSV!</div>
+        <div class="form-group">
+            <label>1. Category</label>
+            <select id="category" onchange="updateClass()"><option value="">-- Select --</option></select>
+        </div>
+        <div class="form-group">
+            <label>2. Class</label>
+            <select id="class" onchange="updateSubClass()" disabled><option value="">-- Select --</option></select>
+        </div>
+        <div class="form-group">
+            <label>3. Sub Class</label>
+            <select id="subclass" onchange="updateBrand()" disabled><option value="">-- Select --</option></select>
+        </div>
+        <div class="form-group">
+            <label>4. Brand</label>
+            <select id="brand" onchange="showMultipleResults()" disabled><option value="">-- Select --</option></select>
+        </div>
+        
+        <div class="result-section" id="resultSection" style="display:none;">
+            <div style="font-weight:bold; color:#0369a1; margin-bottom:12px;">🎯 Matching Offers Found:</div>
+            <div id="multipleResultsContainer"></div>
+        </div>
+    </div>
+
+    <!-- TAB 2: BULK UPLOAD -->
+    <div id="add-tab" class="tab-content">
+        <h3 style="margin-top:0; color:#0f172a;">📊 Bulk CSV Upload</h3>
+        <div class="info-note">
+            💡 <b>File Guidelines:</b><br>
+            Unga kitta irukura <b>`IBO STOCK-1.csv`</b> file-ah direct-ah phone storage-la irundhu select panni load pannikonga.
+        </div>
+        
+        <div class="form-group" style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 10px; text-align: center;">
+            <label style="margin-bottom: 10px; color:#475569;">Select CSV File From Phone</label>
+            <input type="file" id="csvFileInput" accept=".csv" style="padding:5px;">
+        </div>
+        
+        <button class="btn-primary" onclick="handleBulkUpload()">⚡ Process & Import Data</button>
+        
+        <div id="uploadStatus" style="margin-top:15px; font-size:13px; color:#16a34a; font-weight:bold; text-align:center;"></div>
+    </div>
+
+    <!-- TAB 3: FAVORITES -->
+    <div id="fav-tab" class="tab-content">
+        <h3>⭐ Saved Favorites List</h3>
+        <div id="favoritesList">--- No items saved yet ---</div>
+        <button class="btn-primary" style="background:#16a34a; margin-top:15px;" onclick="exportFavorites()">📥 Export Favorites to CSV</button>
+    </div>
+</div>
+
+<div class="toast" id="toastBox">Saved!</div>
+
+<script>
+// Empty data array waiting for user CSV import
+let catalogData = [];
+let favorites = [];
+
+function initApp() {
+    let counter = document.getElementById("totalItemsCounter");
+    if(catalogData.length === 0) {
+        counter.innerText = "No data loaded yet. Please upload CSV!";
+    } else {
+        counter.innerText = `📦 Total Catalog Items: ${catalogData.length}`;
+    }
+    
+    let catSelect = document.getElementById("category");
+    catSelect.innerHTML = '<option value="">-- Select Category --</option>';
+    let uniqueCats = [...new Set(catalogData.map(item => item.cat))].filter(Boolean);
+    uniqueCats.forEach(c => {
+        let opt = document.createElement("option"); 
+        opt.value = c; 
+        opt.innerText = c; 
+        catSelect.appendChild(opt);
+    });
+}
+
+function handleBulkUpload() {
+    let fileInput = document.getElementById("csvFileInput");
+    let statusDiv = document.getElementById("uploadStatus");
+    
+    if (fileInput.files.length === 0) {
+        alert("Dhayavu seidhu oru CSV file-ah select pannunga!");
+        return;
+    }
+    
+    let file = fileInput.files[0];
+    let reader = new FileReader();
+    
+    reader.onload = function(e) {
+        let text = e.target.result;
+        let lines = text.split(/\r?\n/);
+        let addedCount = 0;
+        catalogData = []; // clear old items if any
+        
+        // Starting loop from row 1, ignoring binary headers if format contains any
+        let headerIndex = -1;
+        for(let i = 0; i < Math.min(lines.length, 10); i++) {
+            if(lines[i].includes("offerid") || lines[i].includes("offer") || lines[i].includes("category")) {
+                headerIndex = i;
+                break;
+            }
+        }
+        
+        let startIndex = headerIndex !== -1 ? headerIndex + 1 : 1;
+        
+        for(let i = startIndex; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if(!line) continue;
+            
+            // Standard smart splitting by comma
+            let columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
+            if(columns.length >= 6) {
+                let id = columns[0].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
+                let cat = columns[1].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
+                let cls = columns[2].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
+                let sub = columns[3].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
+                let brand = columns[4].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
+                let name = columns[5].replace(/^"|"$/g, '').replace(/\\_/g, '_').trim();
+                
+                // Ensure valid data entry logic
+                if(id && name && !id.includes("IBO") && !id.includes("offer")) {
+                    catalogData.push({ id, cat, cls, sub, brand, name });
+                    addedCount++;
+                }
+            }
+        }
+        
+        statusDiv.innerText = `✅ Success! ${addedCount} products loaded into memory.`;
+        showToast("Bulk Data Sync Complete!");
+        initApp(); 
+        fileInput.value = ""; 
+        switchTab('search-tab', document.getElementsByClassName('tab-btn')[0]);
+    };
+    
+    reader.onerror = function() {
+        alert("File padikurathula error varuthu!");
+    };
+    
+    reader.readAsText(file);
+}
+
+function updateClass() {
+    resetDropdowns(["class", "subclass", "brand"]);
+    let catVal = document.getElementById("category").value;
+    if(!catVal) return;
+    let filtered = catalogData.filter(item => item.cat === catVal);
+    let unique = [...new Set(filtered.map(item => item.cls))].filter(Boolean);
+    populateDropdown("class", unique);
+    document.getElementById("class").disabled = false;
+}
+
+function updateSubClass() {
+    resetDropdowns(["subclass", "brand"]);
+    let catVal = document.getElementById("category").value;
+    let clsVal = document.getElementById("class").value;
+    if(!clsVal) return;
+    let filtered = catalogData.filter(item => item.cat === catVal && item.cls === clsVal);
+    let unique = [...new Set(filtered.map(item => item.sub))].filter(Boolean);
+    populateDropdown("subclass", unique);
+    document.getElementById("subclass").disabled = false;
+}
+
+function updateBrand() {
+    resetDropdowns(["brand"]);
+    let catVal = document.getElementById("category").value;
+    let clsVal = document.getElementById("class").value;
+    let subVal = document.getElementById("subclass").value;
+    if(!subVal) return;
+    let filtered = catalogData.filter(item => item.cat === catVal && item.cls === clsVal && item.sub === subVal);
+    let unique = [...new Set(filtered.map(item => item.brand))].filter(Boolean);
+    populateDropdown("brand", unique);
+    document.getElementById("brand").disabled = false;
+}
+
+function showMultipleResults() {
+    let catVal = document.getElementById("category").value;
+    let clsVal = document.getElementById("class").value;
+    let subVal = document.getElementById("subclass").value;
+    let brdVal = document.getElementById("brand").value;
+    
+    let container = document.getElementById("multipleResultsContainer");
+    container.innerHTML = "";
+    
+    if(!brdVal) { document.getElementById("resultSection").style.display = "none"; return; }
+    let matches = catalogData.filter(item => item.cat === catVal && item.cls === clsVal && item.sub === subVal && item.brand === brdVal);
+    
+    if(matches.length > 0) {
+        matches.forEach((match) => {
+            container.innerHTML += `
+                <div class="product-card">
+                    <div class="copy-tile" onclick="copyTextDirect('${match.id}', 'Offer ID')">
+                        <div><span class="tile-label">Offer ID</span><br><span class="tile-value">${match.id}</span></div>
+                        <div class="copy-btn">📋 Copy</div>
+                    </div>
+                    <div class="copy-tile" onclick="copyTextDirect('${match.name}', 'Product Name')">
+                        <div><span class="tile-label">Product Name</span><br><span class="tile-value">${match.name}</span></div>
+                        <div class="copy-btn">📋 Copy</div>
+                    </div>
+                    <button class="btn-primary" style="background:#eab308; padding: 6px; font-size:12px; margin-top:8px;" onclick="addSpecificToFavorites(${JSON.stringify(match).replace(/"/g, '&quot;')})">⭐ Add to Favorites</button>
+                </div>
+            `;
+        });
+        document.getElementById("resultSection").style.display = "block";
+    } else {
+        container.innerHTML = "No items found.";
+    }
+}
+
+function addSpecificToFavorites(item) {
+    if(!favorites.some(f => f.id === item.id)) {
+        favorites.push(item);
+        showToast("Favorites-la Add Seyyappattathu! ⭐");
+        renderFavorites();
+    }
+}
+
+function renderFavorites() {
+    let container = document.getElementById("favoritesList");
+    if(favorites.length === 0) { container.innerHTML = "--- No items saved yet ---"; return; }
+    container.innerHTML = "";
+    favorites.forEach(item => {
+        container.innerHTML += `<div class="fav-list-item"><b>ID:</b> ${item.id} <br> <b>Name:</b> ${item.name}</div>`;
+    });
+}
+
+function exportFavorites() {
+    if(favorites.length === 0) { alert("Favorites list empty-ah irukku!"); return; }
+    let csvContent = "data:text/csv;charset=utf-8,Offer ID,Product Name\n" + favorites.map(e => `"${e.id}","${e.name}"`).join("\n");
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "favorite_offers.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function populateDropdown(id, list) {
+    let d = document.getElementById(id);
+    d.innerHTML = `<option value="">-- Select ${id} --</option>`;
+    list.forEach(v => { if(v) { let o = document.createElement("option"); o.value=v; o.innerText=v; d.appendChild(o); } });
+}
+
+function resetDropdowns(ids) {
+    ids.forEach(id => { document.getElementById(id).innerHTML = `<option value="">-- Select --</option>`; document.getElementById(id).disabled = true; });
+    document.getElementById("resultSection").style.display = "none";
+}
+
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).style.display = 'block';
+    if(btn) btn.classList.add('active');
+}
+
+function copyTextDirect(text, label) {
+    navigator.clipboard.writeText(text).then(() => showToast(label + " Copy Seyyappattathu! 👍"));
+}
+
+function showToast(msg) {
+    let t = document.getElementById("toastBox"); t.innerText = msg; t.style.display = "block"; setTimeout(() => t.style.display="none", 2000);
+}
+
+window.onload = function() {
+    initApp();
+};
+</script>
+</body>
+</html>
