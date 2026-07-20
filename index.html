@@ -219,11 +219,23 @@
 let catalogData = [];
 let activeFilteredMatches = [];
 
-// NEW MULTIPLE FOLDER SYSTEM
-let folders = { "Main List": [] }; // Default folder
-let activeFolder = "Main List";
+// NEW: LOCAL STORAGE LOGIC FOR PERSISTENT FOLDERS
+let folders = JSON.parse(localStorage.getItem('iboFolders')) || { "Main List": [] };
+// Failsafe in case localStorage got corrupted and folders is empty
+if(Object.keys(folders).length === 0) folders = { "Main List": [] };
+
+let activeFolder = localStorage.getItem('iboActiveFolder') || "Main List";
+// Check if the saved active folder actually exists
+if(!folders[activeFolder]) activeFolder = Object.keys(folders)[0];
 
 const ADMIN_PASSWORD = "raja123";
+
+// HELPER FUNCTION TO SAVE DATA EVERY TIME IT CHANGES
+function saveFolderDataLocally() {
+    localStorage.setItem('iboFolders', JSON.stringify(folders));
+    localStorage.setItem('iboActiveFolder', activeFolder);
+}
+
 
 // SPLASH SCREEN LOGIC
 function triggerSplashScreen() {
@@ -250,12 +262,10 @@ function updateFolderUI() {
         select.appendChild(opt);
     }
     
-    // Update Badge and Titles
     let currentCart = folders[activeFolder];
     document.getElementById("cartCountBadge").innerText = currentCart.length;
     document.getElementById("folderTabTitle").innerText = `📂 Items in '${activeFolder}'`;
     
-    // Update Cart Container UI
     let container = document.getElementById("cartItemsContainer");
     let btnExcel = document.getElementById("btnExportExcel"); 
     container.innerHTML = "";
@@ -288,6 +298,7 @@ function createNewFolder() {
         }
         folders[name] = [];
         activeFolder = name;
+        saveFolderDataLocally(); // Save to Browser
         updateFolderUI();
         showToast(`Folder '${name}' Created! 📁`);
     }
@@ -295,12 +306,14 @@ function createNewFolder() {
 
 function changeActiveFolder() {
     activeFolder = document.getElementById("activeFolderSelect").value;
+    saveFolderDataLocally(); // Save to Browser
     updateFolderUI();
     showToast(`Switched to '${activeFolder}' 📂`);
 }
 
 function clearCurrentFolder() {
     folders[activeFolder] = [];
+    saveFolderDataLocally(); // Save to Browser
     updateFolderUI();
     showToast(`'${activeFolder}' Cleared! 🧹`);
 }
@@ -312,7 +325,8 @@ function deleteCurrentFolder() {
     }
     if(confirm(`Are you sure you want to delete the folder '${activeFolder}'?`)) {
         delete folders[activeFolder];
-        activeFolder = Object.keys(folders)[0]; // switch back to first available folder
+        activeFolder = Object.keys(folders)[0]; 
+        saveFolderDataLocally(); // Save to Browser
         updateFolderUI();
         showToast("Folder Deleted! 🗑️");
     }
@@ -470,12 +484,14 @@ function addToExportFolder(id) {
         currentCart.push({ id: item.id, name: item.name, qty: qtyVal });
     }
     
+    saveFolderDataLocally(); // Save to Browser
     updateFolderUI(); 
     showToast(`Added to '${activeFolder}'! ✔️`);
 }
 
 function removeFromFolder(index) { 
     folders[activeFolder].splice(index, 1); 
+    saveFolderDataLocally(); // Save to Browser
     updateFolderUI(); 
 }
 
@@ -489,7 +505,7 @@ function exportFolderToCSV() {
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
 
-// ADMIN PANEL LOGIC (Kept exactly same as before)
+// ADMIN PANEL LOGIC
 function checkAdminPassword() {
     let inputPass = document.getElementById("adminPasswordInput").value.trim();
     if(inputPass === ADMIN_PASSWORD) {
@@ -527,7 +543,7 @@ function showToast(msg) { let t = document.getElementById("toastBox"); t.innerTe
 
 window.onload = function() { 
     loadCentralCSV(); 
-    updateFolderUI(); // Initialize folder UI
+    updateFolderUI(); 
     triggerSplashScreen(); 
 };
 </script>
