@@ -1,577 +1,83 @@
-<!DOCTYPE html>
-<html lang="ta">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IBO Smart Catalog</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
-        
-        /* DYNAMIC RED SPLASH SCREEN WINDOW */
-        .splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #b91c1c; color: #ffffff; display: flex; justify-content: center; 
-            align-items: center; z-index: 9999; font-size: 24px; font-weight: 800; 
-            letter-spacing: 0.5px; opacity: 1; transition: opacity 0.4s ease-in-out; 
-            text-align: center; padding: 20px; box-sizing: border-box; pointer-events: none;
-        }
-
-        /* HEADER: RED BACKGROUND WITH WHITE NAME AND LOGO IMAGE PLACEHOLDER */
-        .app-header { background: #b91c1c; color: #ffffff; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border-bottom: 2px solid #a21a1a; }
-        .app-header img { height: 48px; width: auto; max-width: 160px; border-radius: 4px; object-fit: contain; }
-        .app-header-title { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; }
-        
-        /* SLATE CORPORATE TAB BAR */
-        .tab-bar { display: flex; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 14px 10px; border: none; background: none; font-weight: 600; cursor: pointer; color: #64748b; font-size: 13px; white-space: nowrap; transition: all 0.2s ease; }
-        .tab-btn.active { background: #ffffff; color: #334155; border-bottom: 3px solid #334155; }
-        
-        .tab-content { padding: 20px; display: none; }
-        .tab-content.active { display: block; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #475569; font-size: 14px; }
-        select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; color: #1e293b; transition: border 0.2s; }
-        select:focus, input:focus { border-color: #334155; box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1); }
-        
-        /* SLATE/BLUE CONTROL BUTTONS */
-        .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 18px; text-transform: uppercase; }
-        .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; transition: background 0.2s; }
-        .btn-primary:active { background: #1e293b; }
-        
-        .filter-row-search { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
-        .btn-search-trigger { padding: 12px 18px; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .btn-success { width: 100%; padding: 13px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        .result-section { margin-top: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
-        .product-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        
-        .copy-tile { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .copy-tile:hover { background: #f1f5f9; }
-        .tile-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        .tile-value { font-size: 14px; font-weight: bold; color: #1e293b; margin-top: 2px; }
-        .copy-btn { font-size: 11px; color: #475569; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
-        
-        /* EXCLUSIVE STOCK COUNTER - GREEN */
-        .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 10px; background: #16a34a; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(22, 163, 74, 0.2); letter-spacing: 0.3px; }
-        .btn-download-server { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
-        
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .admin-section { background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 12px; margin-top: 10px; }
-        
-        /* FORMAT REFERENCE BOX */
-        .format-reference-box { background: #fffdf5; border: 1px dashed #eab308; padding: 12px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; color: #854d0e; line-height: 1.5; }
-        .format-table-preview { width: 100%; border-collapse: collapse; margin-top: 6px; margin-bottom: 10px; font-size: 11px; background: #fff; }
-        .format-table-preview th, .format-table-preview td { border: 1px solid #fcd34d; padding: 4px 6px; text-align: left; font-family: monospace; }
-        .format-table-preview th { background: #fef08a; }
-        .btn-download-sample { display: inline-block; padding: 6px 12px; background: #eab308; color: #fff; border: none; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; margin-top: 4px; }
-
-        .cart-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .qty-input { width: 65px; padding: 6px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; }
-        .btn-add-cart { padding: 8px 14px; background: #16a34a; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        
-        .contact-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px; }
-        .contact-title { font-size: 14px; font-weight: bold; color: #64748b; text-transform: uppercase; }
-        .contact-name { font-size: 24px; font-weight: 800; color: #334155; margin: 10px 0 8px 0; }
-        .contact-phone { font-size: 18px; font-weight: bold; text-decoration: none; display: inline-block; background: #f1f5f9; color: #334155; padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; }
-        .lock-screen { text-align: center; padding: 35px 15px; }
-    </style>
-</head>
-<body>
-
-<!-- FULL SPLASH SCREEN OVERLAY STRUCTURE -->
-<div id="appSplashScreen" class="splash-screen" style="display: none;">
-    Welcome to IBO Smart Catalog
-</div>
-
-<div class="app-container">
-    <div class="app-header">
-        <img src="1000227258.jpg" alt="IBO Logo" onerror="this.style.display='none';">
-        <div class="app-header-title">IBO Smart Catalog</div>
-    </div>
-    
-    <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('search-tab', this)">🔍 Search</button>
-        <button class="tab-btn" onclick="switchTab('folder-tab', this)">📂 Folder (<span id="cartCountBadge">0</span>)</button>
-        <button class="tab-btn" onclick="switchTab('admin-tab', this)">⚙️ Admin Control</button>
-        <button class="tab-btn" onclick="switchTab('info-tab', this)">📞 Contact</button>
-    </div>
-
-    <!-- TAB 1: SEARCH ENGINE -->
-    <div id="search-tab" class="tab-content active">
-        <div id="filterFieldsForm">
-            <button class="btn-clear-all" onclick="resetEverythingMaster()">🔄 Reset All Filters & Fields</button>
-
-            <div class="form-group"><label>Category</label><select id="category" onchange="handleDropdownChange()"><option value="">-- All Categories --</option></select></div>
-            <div class="form-group"><label>Class</label><select id="class" onchange="handleDropdownChange()"><option value="">-- All Classes --</option></select></div>
-            <div class="form-group"><label>Sub Class</label><select id="subclass" onchange="handleDropdownChange()"><option value="">-- All Sub Classes --</option></select></div>
-            <div class="form-group"><label>Brand</label><select id="brand" onchange="handleDropdownChange()"><option value="">-- All Brands --</option></select></div>
-
-            <button class="btn-primary" onclick="triggerFilterSubmit()">🔍 Show Results</button>
-            
-            <div class="result-section" id="resultSection" style="display:none;">
-                <div class="form-group">
-                    <label style="color:#334155; font-size:14px; font-weight:bold;">🎯 Smart Search Current List</label>
-                    <div class="filter-row-search">
-                        <input type="text" id="masterSearchInput" placeholder="Type words (e.g., 90m FR 1.5)...">
-                        <button class="btn-search-trigger" onclick="handleMasterSearch()">🔍</button>
-                    </div>
-                </div>
-                <div style="font-weight:bold; color:#334155; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
-                <div id="multipleResultsContainer"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 2: EXPORT FOLDER -->
-    <div id="folder-tab" class="tab-content">
-        <h3 style="margin-top:0; color:#1e293b;">📂 Saved Folder Items</h3>
-        <div id="cartItemsContainer"><p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>Folder is empty.</p></div>
-        <button class="btn-success" id="btnExportExcel" onclick="exportFolderToCSV()" style="display:none;">📊 Export Folder to Excel</button>
-        <button class="btn-primary" style="background:#ef4444; margin-top:10px;" onclick="clearFolder()">🚨 Clear Full Folder</button>
-    </div>
-
-    <!-- TAB 3: ADMIN CONTROL MANAGEMENT -->
-    <div id="admin-tab" class="tab-content">
-        <div id="adminLockScreen" class="lock-screen">
-            <h3 style="margin-top:0; color:#1e293b;">🔒 Admin Authentication</h3>
-            <p style="font-size:13px; color:#64748b;">Intha panel access seiya password enter seiyavum.</p>
-            <div class="form-group" style="margin-top:15px;">
-                <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password...">
-            </div>
-            <button class="btn-primary" onclick="checkAdminPassword()">Verify & Unlock</button>
-        </div>
-
-        <div id="adminContentPanel" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:8px; margin-bottom:15px;">
-                <h3 style="margin:0; color:#1e293b;">⚙️ Admin Control Panel</h3>
-                <button onclick="lockAdminPanel()" style="padding:5px 10px; background:#64748b; color:white; border:none; border-radius:4px; font-size:11px; cursor:pointer;">🔒 Lock</button>
-            </div>
-            
-            <div class="data-counter" id="totalItemsCounter">Loading Data Pool Count...</div>
-            <button class="btn-download-server" onclick="downloadFullServerDataToExcel()">📥 Download Full Server Data to Excel</button>
-            
-            <div class="admin-section" style="margin-bottom: 20px;">
-                <h4 style="margin:0 0 10px 0; color:#334155;">➕ Add Single Product</h4>
-                <div class="form-group"><label>Offer ID *</label><input type="text" id="newOfferId" placeholder="Ex: 5002931"></div>
-                <div class="form-group"><label>Product Name *</label><input type="text" id="newProdName" placeholder="Ex: Polycab Wire 1.5 sq mm"></div>
-                
-                <div class="form-group">
-                    <label>Category *</label>
-                    <select id="newCat" onchange="handleAdminDropdownChange('cat')"><option value="">-- Select Category --</option></select>
-                </div>
-                <div class="form-group">
-                    <label>Class *</label>
-                    <select id="newClass" onchange="handleAdminDropdownChange('cls')"><option value="">-- Select Class --</option></select>
-                </div>
-                <div class="form-group">
-                    <label>Sub Class *</label>
-                    <select id="newSubClass" onchange="handleAdminDropdownChange('sub')"><option value="">-- Select Sub Class --</option></select>
-                </div>
-                <div class="form-group">
-                    <label>Brand *</label>
-                    <select id="newBrand"><option value="">-- Select Brand --</option></select>
-                </div>
-                
-                <button class="btn-success" style="width:100%; margin-top:5px;" onclick="addSingleProductManual()">Save New Product</button>
-            </div>
-
-            <div class="admin-section">
-                <h4 style="margin:0 0 5px 0; color:#334155;">📥 Dynamic CSV File Upload</h4>
-                
-                <div class="format-reference-box">
-                    ⚠️ <strong>Excel / CSV Upload Format Guideline:</strong><br>
-                    Upload panra sheet exact ah intha structural header order la thaan irukanum. Map guidelines clear ah code panna keela irukira sample template use pannikonga:<br>
-                    <table class="format-table-preview">
-                        <tr><th>offerid</th><th>category</th><th>class</th><th>subclass</th><th>brand</th><th>name</th></tr>
-                    </table>
-                    <button class="btn-download-sample" onclick="downloadSampleHeaderFormat()">🔽 Download Sample Header File</button>
-                </div>
-                
-                <div style="background:#fff; border:1px solid #cbd5e1; padding:10px; border-radius:8px;">
-                    <label style="font-size:13px; font-weight:bold; color:#475569;">Select CSV File:</label>
-                    <input type="file" id="csvFileInput" accept=".csv" style="padding:5px; margin-top:5px; font-size:12px; border:none;">
-                </div>
-                
-                <div style="margin-top:12px; display:flex; gap:8px;">
-                    <button class="btn-primary" style="background:#ef4444; margin:0; font-size:12px;" onclick="processBulkUpload(true)">💥 Bulk Replace</button>
-                    <button class="btn-primary" style="background:#16a34a; margin:0; font-size:12px;" onclick="processBulkUpload(false)">➕ Append Reports</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 4: CONTACT INFORMATION -->
-    <div id="info-tab" class="tab-content">
-        <div class="contact-box">
-            <div class="contact-title">Any Support Contact</div>
-            <div class="contact-name">Raja</div>
-            <a href="tel:+918072613468" class="contact-phone">📞 +91 8072613468</a>
+<!-- FOLDER SELECTION POPUP HTML -->
+<div id="folderSelectionPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:20px; border-radius:12px; width:85%; max-width:400px;">
+        <h4 style="margin-top:0;">Select Folder</h4>
+        <div id="folderListContainer" style="max-height:200px; overflow-y:auto; margin-bottom:15px;"></div>
+        <div style="border-top:1px solid #ccc; padding-top:10px;">
+            <input type="text" id="newFolderName" placeholder="Enter New Folder Name..." style="width:100%; padding:8px; box-sizing:border-box; margin-bottom:10px;">
+            <button class="btn-primary" onclick="createNewFolderAndSelect()">Create & Select New</button>
+            <button onclick="document.getElementById('folderSelectionPopup').style.display='none'" style="width:100%; padding:8px; margin-top:5px; border:none; background:#ccc; border-radius:6px;">Cancel</button>
         </div>
     </div>
 </div>
-
-<div class="toast" id="toastBox">Copied!</div>
 
 <script>
-let catalogData = [];
-let activeFilteredMatches = [];
-let exportFolder = [];
-const ADMIN_PASSWORD = "raja123";
+let allFolders = { "Default": [] }; // Initial state
+let currentSelectedFolder = "Default";
+let pendingItem = null;
 
-// FUNCTION TO TRIGGER SPLASH SCREEN AND AUTOMATIC FADE-OUT IN 2 SECONDS
-function triggerSplashScreen() {
-    let splash = document.getElementById("appSplashScreen");
-    splash.style.display = "flex";
-    splash.style.opacity = "1";
-    
-    setTimeout(() => {
-        splash.style.opacity = "0";
-        setTimeout(() => {
-            splash.style.display = "none";
-        }, 400); // Wait for transition fade-out animation to complete
-    }, 2000); // 2 Seconds exact visible time
-}
-
-// WATCH APPLICATION FOCUS STATE (TRIGGERS SPLASH WHEN USER RETAKES ACCESS TO THE APP WINDOW)
-document.addEventListener("visibilitychange", function() {
-    if (document.visibilityState === "visible") {
-        triggerSplashScreen();
-    }
-});
-
-function loadCentralCSV() {
-    fetch('IBO STOCK-1.csv')
-    .then(response => { if (!response.ok) throw new Error(); return response.text(); })
-    .then(text => parseCSVTextData(text, false))
-    .catch(() => { updateStockCounterDisplay(); });
-}
-
-function parseCSVTextData(text, isAppendMode) {
-    let lines = text.split(/\r?\n/);
-    let headerIndex = -1;
-    for(let i = 0; i < Math.min(lines.length, 10); i++) {
-        if(lines[i].toLowerCase().includes("offerid") || lines[i].toLowerCase().includes("category")) { headerIndex = i; break; }
-    }
-    let startIndex = headerIndex !== -1 ? headerIndex + 1 : 1;
-    let tempArray = [];
-    
-    for(let i = startIndex; i < lines.length; i++) {
-        let line = lines[i].trim(); if(!line) continue;
-        let columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        
-        if(columns.length >= 6) {
-            let id = columns[0].replace(/^"|"$/g, '').trim();
-            let cat = columns[1].replace(/^"|"$/g, '').trim();
-            let cls = columns[2].replace(/^"|"$/g, '').trim();
-            let sub = columns[3].replace(/^"|"$/g, '').trim();
-            let brand = columns[4].replace(/^"|"$/g, '').trim();
-            let name = columns[5].replace(/^"|"$/g, '').trim();
-            
-            if(id.toLowerCase().includes("ibo") || id.toLowerCase().includes("offer") || (!id && !name && !cat)) continue;
-            
-            if(!id || !name || !cat || !cls || !sub || !brand) {
-                alert(`🚨 File Validation Error!\nRow ${i + 1} la category, class, subclass, brand, offerid, illa product name field fill aagama empty ah iruku! Please check details.`);
-                return;
-            }
-            
-            tempArray.push({ id, cat, cls, sub, brand, name });
-        } else if(line.length > 0) {
-            alert(`🚨 Invalid Structure Error!\nRow ${i + 1} structure clear ah illa. Check headers.`);
-            return;
-        }
-    }
-    
-    if(isAppendMode) {
-        catalogData = catalogData.concat(tempArray);
-        showToast(`Appended ${tempArray.length} items successfully!`);
-    } else {
-        catalogData = tempArray;
-        showToast(`Database synchronized with ${tempArray.length} items!`);
-    }
-    
-    updateStockCounterDisplay();
-    populateAllDropdownsInitial();
-    populateAdminDropdownsInitial();
-}
-
-function updateStockCounterDisplay() {
-    let counter = document.getElementById("totalItemsCounter");
-    if(counter) {
-        counter.innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
-    }
-}
-
-function downloadFullServerDataToExcel() {
-    if(catalogData.length === 0) { alert("Server data list empty-ah iruku, download panna mudiyathu!"); return; }
-    let csvContent = "data:text/csv;charset=utf-8,offerid,category,class,subclass,brand,name\n";
-    catalogData.forEach(item => {
-        csvContent += `"${item.id}","${item.cat.replace(/"/g, '""')}","${item.cls.replace(/"/g, '""')}","${item.sub.replace(/"/g, '""')}","${item.brand.replace(/"/g, '""')}","${item.name.replace(/"/g, '""')}"\n`;
-    });
-    let link = document.createElement("a");
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `Full_Server_Stock_Report.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("Full Server Excel Downloaded! 📥");
-}
-
-function downloadSampleHeaderFormat() {
-    let csvContent = "data:text/csv;charset=utf-8,offerid,category,class,subclass,brand,name\n";
-    let link = document.createElement("a");
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `IBO_Upload_Model_Format.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("Sample Header Template Downloaded! 📄");
-}
-
-function populateAllDropdownsInitial() {
-    populateSingleDropdown("category", [...new Set(catalogData.map(i => i.cat))], "Categories");
-    populateSingleDropdown("class", [...new Set(catalogData.map(i => i.cls))], "Classes");
-    populateSingleDropdown("subclass", [...new Set(catalogData.map(i => i.sub))], "Sub Classes");
-    populateSingleDropdown("brand", [...new Set(catalogData.map(i => i.brand))], "Brands");
-}
-
-function populateAdminDropdownsInitial() {
-    populateSingleDropdown("newCat", [...new Set(catalogData.map(i => i.cat))], "Category");
-    populateSingleDropdown("newClass", [...new Set(catalogData.map(i => i.cls))], "Class");
-    populateSingleDropdown("newSubClass", [...new Set(catalogData.map(i => i.sub))], "Sub Class");
-    populateSingleDropdown("newBrand", [...new Set(catalogData.map(i => i.brand))], "Brand");
-}
-
-function populateSingleDropdown(id, list, label) {
-    let select = document.getElementById(id);
-    if(!select) return;
-    let currentVal = select.value;
-    select.innerHTML = `<option value="">-- Select ${label} --</option>`;
-    list.filter(Boolean).sort().forEach(v => {
-        let opt = document.createElement("option"); opt.value = v; opt.innerText = v;
-        if(v === currentVal) opt.selected = true;
-        select.appendChild(opt);
-    });
-}
-
-function handleDropdownChange() {
-    let catVal = document.getElementById("category").value;
-    let clsVal = document.getElementById("class").value;
-    let subVal = document.getElementById("subclass").value;
-    let brdVal = document.getElementById("brand").value;
-    let matches = catalogData;
-    if(catVal) matches = matches.filter(i => i.cat === catVal);
-    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
-    if(subVal) matches = matches.filter(i => i.sub === subVal);
-    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    if(!catVal) populateSingleDropdown("category", [...new Set(matches.map(i => i.cat))], "Categories");
-    if(!clsVal) populateSingleDropdown("class", [...new Set(matches.map(i => i.cls))], "Classes");
-    if(!subVal) populateSingleDropdown("subclass", [...new Set(matches.map(i => i.sub))], "Sub Classes");
-    if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))], "Brands");
-}
-
-function handleAdminDropdownChange(level) {
-    let catVal = document.getElementById("newCat").value;
-    let clsVal = document.getElementById("newClass").value;
-    let subVal = document.getElementById("newSubClass").value;
-    let pool = catalogData;
-    
-    if(level === 'cat') {
-        if(catVal) pool = pool.filter(i => i.cat === catVal);
-        populateSingleDropdown("newClass", [...new Set(pool.map(i => i.cls))], "Class");
-        populateSingleDropdown("newSubClass", [...new Set(pool.map(i => i.sub))], "Sub Class");
-        populateSingleDropdown("newBrand", [...new Set(pool.map(i => i.brand))], "Brand");
-    } else if(level === 'cls') {
-        if(catVal) pool = pool.filter(i => i.cat === catVal);
-        if(clsVal) pool = pool.filter(i => i.cls === clsVal);
-        populateSingleDropdown("newSubClass", [...new Set(pool.map(i => i.sub))], "Sub Class");
-        populateSingleDropdown("newBrand", [...new Set(pool.map(i => i.brand))], "Brand");
-    } else if(level === 'sub') {
-        if(catVal) pool = pool.filter(i => i.cat === catVal);
-        if(clsVal) pool = pool.filter(i => i.cls === clsVal);
-        if(subVal) pool = pool.filter(i => i.sub === subVal);
-        populateSingleDropdown("newBrand", [...new Set(pool.map(i => i.brand))], "Brand");
-    }
-}
-
-function checkAdminPassword() {
-    let inputPass = document.getElementById("adminPasswordInput").value.trim();
-    if(inputPass === ADMIN_PASSWORD) {
-        document.getElementById("adminLockScreen").style.display = "none";
-        document.getElementById("adminContentPanel").style.display = "block";
-        document.getElementById("adminPasswordInput").value = "";
-        updateStockCounterDisplay();
-        showToast("Access Granted! 🔓");
-    } else {
-        alert("Wrong Password! Access Denied.");
-    }
-}
-
-function lockAdminPanel() {
-    document.getElementById("adminContentPanel").style.display = "none";
-    document.getElementById("adminLockScreen").style.display = "block";
-}
-
-function resetEverythingMaster() {
-    document.getElementById("category").value = "";
-    document.getElementById("class").value = "";
-    document.getElementById("subclass").value = "";
-    document.getElementById("brand").value = "";
-    document.getElementById("masterSearchInput").value = "";
-    populateAllDropdownsInitial();
-    activeFilteredMatches = [];
-    document.getElementById("resultSection").style.display = "none";
-    showToast("Everything Reset Cleanly! 🔄");
-}
-
-function triggerFilterSubmit() {
-    document.getElementById("masterSearchInput").value = "";
-    let catVal = document.getElementById("category").value;
-    let clsVal = document.getElementById("class").value;
-    let subVal = document.getElementById("subclass").value;
-    let brdVal = document.getElementById("brand").value;
-    let matches = catalogData;
-    if(catVal) matches = matches.filter(i => i.cat === catVal);
-    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
-    if(subVal) matches = matches.filter(i => i.sub === subVal);
-    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    activeFilteredMatches = matches;
-    document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${matches.length}`;
-    renderCatalogCards(activeFilteredMatches.slice(0, 100));
-    document.getElementById("resultSection").style.display = "block";
-}
-
-function handleMasterSearch() {
-    let rawQuery = document.getElementById("masterSearchInput").value.toLowerCase().trim();
-    let currentPool = activeFilteredMatches.length > 0 ? activeFilteredMatches : catalogData;
-    if(!rawQuery) {
-        renderCatalogCards(currentPool.slice(0, 100));
-        document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${currentPool.length}`;
-        return;
-    }
-    let searchTerms = rawQuery.split(/\s+/);
-    let textFiltered = currentPool.filter(item => {
-        let targetText = (item.id + " " + item.name + " " + item.brand).toLowerCase();
-        return searchTerms.every(term => targetText.includes(term));
-    });
-    document.getElementById("resultCountLabel").innerText = `🎯 Filtered Matches: ${textFiltered.length}`;
-    renderCatalogCards(textFiltered.slice(0, 100));
-}
-
-function addSingleProductManual() {
-    let id = document.getElementById("newOfferId").value.trim();
-    let name = document.getElementById("newProdName").value.trim();
-    let cat = document.getElementById("newCat").value.trim();
-    let cls = document.getElementById("newClass").value.trim();
-    let sub = document.getElementById("newSubClass").value.trim();
-    let brand = document.getElementById("newBrand").value.trim();
-    
-    if(!id || !name || !cat || !cls || !sub || !brand) { 
-        alert("🚨 Upload Error!\nCategory, Class, Sub Class, Brand, Offer ID, and Product Name must fill panni irukanum!"); 
-        return; 
-    }
-    
-    catalogData.unshift({ id, cat, cls, sub, brand, name });
-    updateStockCounterDisplay();
-    
-    document.getElementById("newOfferId").value = ""; 
-    document.getElementById("newProdName").value = "";
-    populateAllDropdownsInitial();
-    populateAdminDropdownsInitial();
-    showToast("Product Added Successfully! ✅");
-}
-
-function processBulkUpload(isOverwrite) {
-    let fileInput = document.getElementById("csvFileInput");
-    if (!fileInput.files.length) { alert("Please choose a CSV sheet file first!"); return; }
-    
-    let file = fileInput.files[0];
-    let reader = new FileReader();
-    reader.onload = function(e) {
-        let text = e.target.result;
-        parseCSVTextData(text, !isOverwrite);
-        fileInput.value = ""; 
-    };
-    reader.readAsText(file);
-}
-
-function renderCatalogCards(dataList) {
-    let container = document.getElementById("multipleResultsContainer"); container.innerHTML = "";
-    if(dataList.length > 0) {
-        dataList.forEach((match) => {
-            container.innerHTML += `
-                <div class="product-card">
-                    <div class="copy-tile" onclick="copyTextDirect('${match.id}', 'Offer ID')">
-                        <div><span class="tile-label">Offer ID</span><br><span class="tile-value">${match.id}</span></div><div class="copy-btn">📋 Copy</div>
-                    </div>
-                    <div class="copy-tile" onclick="copyTextDirect('${match.name}', 'Product Name')">
-                        <div><span class="tile-label">Product Name</span><br><span class="tile-value">${match.name}</span></div><div class="copy-btn">📋 Copy</div>
-                    </div>
-                    <div class="cart-controls">
-                        <div><span style="font-size:12px; font-weight:600; color:#475569;">Qty:</span>
-                        <input type="number" class="qty-input" id="qty_${match.id}" value="1" min="1"></div>
-                        <button class="btn-add-cart" onclick="addToExportFolder('${match.id}')">➕ Add to Folder</button>
-                    </div>
-                </div>`;
-        });
-    } else { container.innerHTML = "<div style='text-align:center; font-size:13px; color:#64748b; padding:10px;'>No products found.</div>"; }
-}
-
+// ADD BUTTON MODIFIED
 function addToExportFolder(id) {
-    let item = catalogData.find(i => i.id === id);
-    let qtyVal = parseInt(document.getElementById(`qty_${id}`).value) || 1;
-    let existingIndex = exportFolder.findIndex(i => i.id === id);
-    if(existingIndex > -1) exportFolder[existingIndex].qty += qtyVal;
-    else exportFolder.push({ id: item.id, name: item.name, qty: qtyVal });
-    updateCartUI(); showToast("Added to Folder! ✔️");
+    pendingItem = catalogData.find(i => i.id === id);
+    renderFolderPopup();
+    document.getElementById('folderSelectionPopup').style.display = 'flex';
 }
 
-function updateCartUI() {
-    document.getElementById("cartCountBadge").innerText = exportFolder.length;
-    let container = document.getElementById("cartItemsContainer");
-    let btnExcel = document.getElementById("btnExportExcel"); container.innerHTML = "";
-    if(exportFolder.length === 0) { container.innerHTML = "<p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>Folder is empty.</p>"; btnExcel.style.display = "none"; return; }
-    exportFolder.forEach((item, index) => {
-        container.innerHTML += `
-            <div style="display:flex; justify-content:between; align-items:center; padding:8px 0; border-bottom:1px solid #e2e8f0; font-size:13px;">
-                <div style="max-width:70%;"><strong>${item.id}</strong> - ${item.name}</div>
-                <div style="margin-left:auto;">
-                    <span style="background:#e2e8f0; color:#334155; padding:3px 8px; border-radius:4px; font-weight:bold;">Qty: ${item.qty}</span>
-                    <span style="color:#ef4444; font-weight:bold; margin-left:10px; cursor:pointer;" onclick="removeFromFolder(${index})">❌</span>
-                </div>
-            </div>`;
+function renderFolderPopup() {
+    let container = document.getElementById('folderListContainer');
+    container.innerHTML = "";
+    Object.keys(allFolders).forEach(folderName => {
+        container.innerHTML += `<div onclick="selectFolder('${folderName}')" style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; font-weight:${currentSelectedFolder === folderName ? 'bold' : 'normal'}; color:${currentSelectedFolder === folderName ? '#2563eb' : '#333'}">${folderName}</div>`;
     });
-    btnExcel.style.display = "block";
 }
 
-function removeFromFolder(index) { exportFolder.splice(index, 1); updateCartUI(); }
-function clearFolder() { exportFolder = []; updateCartUI(); showToast("Folder Cleared!"); }
-
-function exportFolderToCSV() {
-    if(exportFolder.length === 0) return;
-    let csvContent = "data:text/csv;charset=utf-8,Offer ID,Product Name,Quantity\n";
-    exportFolder.forEach(item => { csvContent += `"${item.id}","${item.name.replace(/"/g, '""')}",${item.qty}\n`; });
-    let link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `Catalog_Report.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+function selectFolder(name) {
+    currentSelectedFolder = name;
+    finalizeAdd();
 }
 
-function switchTab(tabId, btn) {
-    if (tabId !== 'admin-tab') {
-        lockAdminPanel();
+function createNewFolderAndSelect() {
+    let name = document.getElementById('newFolderName').value.trim();
+    if(name && !allFolders[name]) {
+        allFolders[name] = [];
+        currentSelectedFolder = name;
+        document.getElementById('newFolderName').value = "";
+        finalizeAdd();
     }
-    
-    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).style.display = 'block';
-    if(btn) btn.classList.add('active');
 }
-function copyTextDirect(text, label) { navigator.clipboard.writeText(text).then(() => showToast(label + " Copied! 👍")); }
-function showToast(msg) { let t = document.getElementById("toastBox"); t.innerText = msg; t.style.display = "block"; setTimeout(() => t.style.display="none", 2000); }
 
-window.onload = function() { 
-    loadCentralCSV(); 
-    triggerSplashScreen(); // Launch splash immediately on initial first open
-};
+function finalizeAdd() {
+    let qtyVal = parseInt(document.getElementById(`qty_${pendingItem.id}`).value) || 1;
+    allFolders[currentSelectedFolder].push({ id: pendingItem.id, name: pendingItem.name, qty: qtyVal });
+    document.getElementById('folderSelectionPopup').style.display = 'none';
+    showToast(`Added to folder: ${currentSelectedFolder}! ✅`);
+    updateCartUI();
+}
+
+// UPDATE UI TO SHOW DYNAMIC FOLDERS
+function updateCartUI() {
+    let container = document.getElementById("cartItemsContainer");
+    container.innerHTML = "";
+    let totalItems = 0;
+    
+    Object.keys(allFolders).forEach(folderName => {
+        if(allFolders[folderName].length > 0) {
+            container.innerHTML += `<div style="margin-top:15px; font-weight:bold; color:#2563eb;">📂 ${folderName}</div>`;
+            allFolders[folderName].forEach((item, index) => {
+                totalItems++;
+                container.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; font-size:12px;">
+                        <div>${item.name} (Qty: ${item.qty})</div>
+                        <span style="color:red; cursor:pointer;" onclick="removeFromFolder('${folderName}', ${index})">❌</span>
+                    </div>`;
+            });
+        }
+    });
+    document.getElementById("cartCountBadge").innerText = totalItems;
+}
+
+function removeFromFolder(folderName, index) {
+    allFolders[folderName].splice(index, 1);
+    updateCartUI();
+}
 </script>
-</body>
-</html>
