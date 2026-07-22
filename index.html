@@ -8,7 +8,6 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
         
-        /* DYNAMIC RED SPLASH SCREEN WINDOW */
         .splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #b91c1c; color: #ffffff; display: flex; justify-content: center; 
@@ -17,17 +16,14 @@
             text-align: center; padding: 20px; box-sizing: border-box; pointer-events: none;
         }
 
-        /* HEADER */
         .app-header { background: #b91c1c; color: #ffffff; padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border-bottom: 2px solid #a21a1a; }
         .app-header img { height: 48px; width: auto; max-width: 160px; border-radius: 4px; object-fit: contain; }
         .app-header-title { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; }
         
-        /* SLATE CORPORATE TAB BAR */
         .tab-bar { display: flex; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
         .tab-btn { flex: 1; padding: 14px 10px; border: none; background: none; font-weight: 600; cursor: pointer; color: #64748b; font-size: 13px; white-space: nowrap; transition: all 0.2s ease; }
         .tab-btn.active { background: #ffffff; color: #334155; border-bottom: 3px solid #334155; }
         
-        /* FOLDER MANAGEMENT BAR */
         .folder-controls { display: flex; align-items: center; gap: 8px; background: #e2e8f0; padding: 10px 15px; border-bottom: 1px solid #cbd5e1; }
         .folder-select { flex: 1; padding: 8px; border: 1px solid #94a3b8; border-radius: 6px; font-weight: bold; color: #1e293b; outline: none; background: #fff; font-size: 14px;}
         .btn-new-folder { padding: 8px 12px; background: #eab308; color: #000; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
@@ -39,7 +35,6 @@
         select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; color: #1e293b; transition: border 0.2s; }
         select:focus, input:focus { border-color: #334155; box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1); }
         
-        /* CONTROL BUTTONS */
         .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 18px; text-transform: uppercase; }
         .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; transition: background 0.2s; }
         .btn-primary:active { background: #1e293b; }
@@ -82,7 +77,6 @@
 </head>
 <body>
 
-<!-- FULL SPLASH SCREEN -->
 <div id="appSplashScreen" class="splash-screen" style="display: none;">
     Welcome to IBO Smart Catalog
 </div>
@@ -100,7 +94,7 @@
         <button class="tab-btn" onclick="switchTab('info-tab', this)">📞 Contact</button>
     </div>
 
-    <!-- GLOBAL FOLDER MANAGEMENT PANEL -->
+    <!-- FOLDER MANAGEMENT -->
     <div id="globalFolderPanel" class="folder-controls">
         <label style="font-size:13px; font-weight:bold; color:#475569;">📁 Folder:</label>
         <select id="activeFolderSelect" class="folder-select" onchange="changeActiveFolder()"></select>
@@ -171,10 +165,10 @@
                 <div class="form-group"><label>Offer ID *</label><input type="text" id="newOfferId" placeholder="Ex: 5002931"></div>
                 <div class="form-group"><label>Product Name *</label><input type="text" id="newProdName" placeholder="Ex: Polycab Wire 1.5 sq mm"></div>
                 
-                <div class="form-group"><label>Category *</label><select id="newCat" onchange="handleAdminDropdownChange('cat')"><option value="">-- Select Category --</option></select></div>
-                <div class="form-group"><label>Class *</label><select id="newClass" onchange="handleAdminDropdownChange('cls')"><option value="">-- Select Class --</option></select></div>
-                <div class="form-group"><label>Sub Class *</label><select id="newSubClass" onchange="handleAdminDropdownChange('sub')"><option value="">-- Select Sub Class --</option></select></div>
-                <div class="form-group"><label>Brand *</label><select id="newBrand"><option value="">-- Select Brand --</option></select></div>
+                <div class="form-group"><label>Category</label><input type="text" id="newCat" placeholder="Ex: Wires"></div>
+                <div class="form-group"><label>Class</label><input type="text" id="newClass" placeholder="Ex: FR PVC"></div>
+                <div class="form-group"><label>Sub Class</label><input type="text" id="newSubClass" placeholder="Ex: 1.5 sqmm"></div>
+                <div class="form-group"><label>Brand</label><input type="text" id="newBrand" placeholder="Ex: Polycab"></div>
                 
                 <button class="btn-success" style="width:100%; margin-top:5px;" onclick="addSingleProductManual()">Save New Product</button>
             </div>
@@ -183,7 +177,7 @@
                 <h4 style="margin:0 0 5px 0; color:#334155;">📥 Dynamic CSV File Upload</h4>
                 <div class="format-reference-box">
                     ⚠️ <strong>Excel / CSV Upload Format Guideline:</strong><br>
-                    Upload panra sheet exact ah intha structural header order la thaan irukanum. Map guidelines clear ah code panna keela irukira sample template use pannikonga:<br>
+                    Upload panra sheet exact ah intha header order la thaan irukanum. Sample file-ah download panni check pannikonga:<br>
                     <table class="format-table-preview">
                         <tr><th>offerid</th><th>category</th><th>class</th><th>subclass</th><th>brand</th><th>name</th></tr>
                     </table>
@@ -219,25 +213,21 @@
 let catalogData = [];
 let activeFilteredMatches = [];
 
-// NEW: LOCAL STORAGE LOGIC FOR PERSISTENT FOLDERS
+// LOCAL STORAGE LOGIC FOR PERSISTENT FOLDERS
 let folders = JSON.parse(localStorage.getItem('iboFolders')) || { "Main List": [] };
-// Failsafe in case localStorage got corrupted and folders is empty
 if(Object.keys(folders).length === 0) folders = { "Main List": [] };
 
 let activeFolder = localStorage.getItem('iboActiveFolder') || "Main List";
-// Check if the saved active folder actually exists
 if(!folders[activeFolder]) activeFolder = Object.keys(folders)[0];
 
 const ADMIN_PASSWORD = "raja123";
 
-// HELPER FUNCTION TO SAVE DATA EVERY TIME IT CHANGES
 function saveFolderDataLocally() {
     localStorage.setItem('iboFolders', JSON.stringify(folders));
     localStorage.setItem('iboActiveFolder', activeFolder);
 }
 
-
-// SPLASH SCREEN LOGIC
+// SPLASH SCREEN
 function triggerSplashScreen() {
     let splash = document.getElementById("appSplashScreen");
     splash.style.display = "flex"; splash.style.opacity = "1";
@@ -246,12 +236,9 @@ function triggerSplashScreen() {
         setTimeout(() => { splash.style.display = "none"; }, 400);
     }, 2000); 
 }
-document.addEventListener("visibilitychange", function() {
-    if (document.visibilityState === "visible") triggerSplashScreen();
-});
+// Note: visibilitychange event listener removed here so it doesn't trigger repeatedly.
 
-
-// FOLDER MANAGEMENT LOGIC
+// FOLDER MANAGEMENT UI
 function updateFolderUI() {
     let select = document.getElementById("activeFolderSelect");
     select.innerHTML = "";
@@ -298,7 +285,7 @@ function createNewFolder() {
         }
         folders[name] = [];
         activeFolder = name;
-        saveFolderDataLocally(); // Save to Browser
+        saveFolderDataLocally();
         updateFolderUI();
         showToast(`Folder '${name}' Created! 📁`);
     }
@@ -306,14 +293,14 @@ function createNewFolder() {
 
 function changeActiveFolder() {
     activeFolder = document.getElementById("activeFolderSelect").value;
-    saveFolderDataLocally(); // Save to Browser
+    saveFolderDataLocally();
     updateFolderUI();
     showToast(`Switched to '${activeFolder}' 📂`);
 }
 
 function clearCurrentFolder() {
     folders[activeFolder] = [];
-    saveFolderDataLocally(); // Save to Browser
+    saveFolderDataLocally();
     updateFolderUI();
     showToast(`'${activeFolder}' Cleared! 🧹`);
 }
@@ -326,14 +313,13 @@ function deleteCurrentFolder() {
     if(confirm(`Are you sure you want to delete the folder '${activeFolder}'?`)) {
         delete folders[activeFolder];
         activeFolder = Object.keys(folders)[0]; 
-        saveFolderDataLocally(); // Save to Browser
+        saveFolderDataLocally();
         updateFolderUI();
         showToast("Folder Deleted! 🗑️");
     }
 }
 
-
-// MAIN DATA & RENDER LOGIC
+// MAIN DATA LOGIC
 function loadCentralCSV() {
     fetch('IBO STOCK-1.csv')
     .then(response => { if (!response.ok) throw new Error(); return response.text(); })
@@ -366,7 +352,9 @@ function parseCSVTextData(text, isAppendMode) {
     }
     if(isAppendMode) { catalogData = catalogData.concat(tempArray); } 
     else { catalogData = tempArray; }
-    updateStockCounterDisplay(); populateAllDropdownsInitial(); populateAdminDropdownsInitial();
+    
+    updateStockCounterDisplay(); 
+    populateAllDropdownsInitial(); 
 }
 
 function updateStockCounterDisplay() {
@@ -379,13 +367,6 @@ function populateAllDropdownsInitial() {
     populateSingleDropdown("class", [...new Set(catalogData.map(i => i.cls))], "Classes");
     populateSingleDropdown("subclass", [...new Set(catalogData.map(i => i.sub))], "Sub Classes");
     populateSingleDropdown("brand", [...new Set(catalogData.map(i => i.brand))], "Brands");
-}
-
-function populateAdminDropdownsInitial() {
-    populateSingleDropdown("newCat", [...new Set(catalogData.map(i => i.cat))], "Category");
-    populateSingleDropdown("newClass", [...new Set(catalogData.map(i => i.cls))], "Class");
-    populateSingleDropdown("newSubClass", [...new Set(catalogData.map(i => i.sub))], "Sub Class");
-    populateSingleDropdown("newBrand", [...new Set(catalogData.map(i => i.brand))], "Brand");
 }
 
 function populateSingleDropdown(id, list, label) {
@@ -484,14 +465,14 @@ function addToExportFolder(id) {
         currentCart.push({ id: item.id, name: item.name, qty: qtyVal });
     }
     
-    saveFolderDataLocally(); // Save to Browser
+    saveFolderDataLocally();
     updateFolderUI(); 
     showToast(`Added to '${activeFolder}'! ✔️`);
 }
 
 function removeFromFolder(index) { 
     folders[activeFolder].splice(index, 1); 
-    saveFolderDataLocally(); // Save to Browser
+    saveFolderDataLocally();
     updateFolderUI(); 
 }
 
@@ -505,7 +486,85 @@ function exportFolderToCSV() {
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
 
-// ADMIN PANEL LOGIC
+// ----------------------------------------------------
+// ADMIN PANEL FUNCTIONS
+// ----------------------------------------------------
+
+function addSingleProductManual() {
+    let id = document.getElementById("newOfferId").value.trim();
+    let name = document.getElementById("newProdName").value.trim();
+    let cat = document.getElementById("newCat").value.trim() || "-";
+    let cls = document.getElementById("newClass").value.trim() || "-";
+    let sub = document.getElementById("newSubClass").value.trim() || "-";
+    let brand = document.getElementById("newBrand").value.trim() || "-";
+
+    if(!id || !name) {
+        alert("Offer ID and Product Name are mandatory!"); 
+        return;
+    }
+
+    catalogData.push({ id, cat, cls, sub, brand, name });
+    
+    updateStockCounterDisplay();
+    populateAllDropdownsInitial();
+    
+    document.getElementById("newOfferId").value = "";
+    document.getElementById("newProdName").value = "";
+    document.getElementById("newCat").value = "";
+    document.getElementById("newClass").value = "";
+    document.getElementById("newSubClass").value = "";
+    document.getElementById("newBrand").value = "";
+    
+    showToast("Product Added Successfully! ✅");
+}
+
+function downloadSampleHeaderFormat() {
+    let csvContent = "data:text/csv;charset=utf-8,offerid,category,class,subclass,brand,name\n";
+    let link = document.createElement("a"); 
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", "Sample_Upload_Template.csv"); 
+    document.body.appendChild(link); 
+    link.click(); 
+    document.body.removeChild(link);
+}
+
+function downloadFullServerDataToExcel() {
+    if(catalogData.length === 0) { 
+        alert("No data available to download!"); 
+        return; 
+    }
+    let csvContent = "data:text/csv;charset=utf-8,offerid,category,class,subclass,brand,name\n";
+    catalogData.forEach(item => { 
+        csvContent += `"${item.id}","${item.cat}","${item.cls}","${item.sub}","${item.brand}","${item.name.replace(/"/g, '""')}"\n`; 
+    });
+    let link = document.createElement("a"); 
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `Full_Catalog_Data.csv`); 
+    document.body.appendChild(link); 
+    link.click(); 
+    document.body.removeChild(link);
+}
+
+function processBulkUpload(isReplace) {
+    let fileInput = document.getElementById("csvFileInput");
+    if(fileInput.files.length === 0) {
+        alert("Please select a CSV file first!"); 
+        return;
+    }
+    
+    let file = fileInput.files[0];
+    let reader = new FileReader();
+    
+    reader.onload = function(e) {
+        let text = e.target.result;
+        parseCSVTextData(text, !isReplace);
+        showToast(isReplace ? "Data Replaced Successfully! 💥" : "Data Appended Successfully! ➕");
+        fileInput.value = ""; 
+    };
+    
+    reader.readAsText(file);
+}
+
 function checkAdminPassword() {
     let inputPass = document.getElementById("adminPasswordInput").value.trim();
     if(inputPass === ADMIN_PASSWORD) {
@@ -530,7 +589,6 @@ function switchTab(tabId, btn) {
     document.getElementById(tabId).style.display = 'block';
     if(btn) btn.classList.add('active');
     
-    // Show Folder Panel only on Search and Folder tabs
     let folderPanel = document.getElementById("globalFolderPanel");
     if(tabId === 'search-tab' || tabId === 'folder-tab') {
         folderPanel.style.display = 'flex';
@@ -544,7 +602,12 @@ function showToast(msg) { let t = document.getElementById("toastBox"); t.innerTe
 window.onload = function() { 
     loadCentralCSV(); 
     updateFolderUI(); 
-    triggerSplashScreen(); 
+    
+    // Check session storage so it only shows once per browser tab session
+    if(!sessionStorage.getItem('iboSplashShown')) {
+        triggerSplashScreen(); 
+        sessionStorage.setItem('iboSplashShown', 'true');
+    }
 };
 </script>
 </body>
