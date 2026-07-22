@@ -162,13 +162,19 @@
             
             <div class="admin-section" style="margin-bottom: 20px;">
                 <h4 style="margin:0 0 10px 0; color:#334155;">➕ Add Single Product</h4>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:12px; color:#64748b;">Select existing attributes below:</span>
+                    <button onclick="resetAdminDropdowns()" style="padding:4px 8px; background:#e2e8f0; border:none; border-radius:4px; font-size:11px; cursor:pointer;">🔄 Reset Fields</button>
+                </div>
+
+                <div class="form-group"><label>Category *</label><select id="newCat" onchange="handleAdminDropdownChange()"><option value="">-- Select Category --</option></select></div>
+                <div class="form-group"><label>Class *</label><select id="newClass" onchange="handleAdminDropdownChange()"><option value="">-- Select Class --</option></select></div>
+                <div class="form-group"><label>Sub Class *</label><select id="newSubClass" onchange="handleAdminDropdownChange()"><option value="">-- Select Sub Class --</option></select></div>
+                <div class="form-group"><label>Brand *</label><select id="newBrand" onchange="handleAdminDropdownChange()"><option value="">-- Select Brand --</option></select></div>
+
                 <div class="form-group"><label>Offer ID *</label><input type="text" id="newOfferId" placeholder="Ex: 5002931"></div>
                 <div class="form-group"><label>Product Name *</label><input type="text" id="newProdName" placeholder="Ex: Polycab Wire 1.5 sq mm"></div>
-                
-                <div class="form-group"><label>Category</label><input type="text" id="newCat" placeholder="Ex: Wires"></div>
-                <div class="form-group"><label>Class</label><input type="text" id="newClass" placeholder="Ex: FR PVC"></div>
-                <div class="form-group"><label>Sub Class</label><input type="text" id="newSubClass" placeholder="Ex: 1.5 sqmm"></div>
-                <div class="form-group"><label>Brand</label><input type="text" id="newBrand" placeholder="Ex: Polycab"></div>
                 
                 <button class="btn-success" style="width:100%; margin-top:5px;" onclick="addSingleProductManual()">Save New Product</button>
             </div>
@@ -236,7 +242,6 @@ function triggerSplashScreen() {
         setTimeout(() => { splash.style.display = "none"; }, 400);
     }, 2000); 
 }
-// Note: visibilitychange event listener removed here so it doesn't trigger repeatedly.
 
 // FOLDER MANAGEMENT UI
 function updateFolderUI() {
@@ -355,18 +360,12 @@ function parseCSVTextData(text, isAppendMode) {
     
     updateStockCounterDisplay(); 
     populateAllDropdownsInitial(); 
+    populateAllAdminDropdownsInitial(); // Populate Admin Dropdowns too!
 }
 
 function updateStockCounterDisplay() {
     let counter = document.getElementById("totalItemsCounter");
     if(counter) counter.innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
-}
-
-function populateAllDropdownsInitial() {
-    populateSingleDropdown("category", [...new Set(catalogData.map(i => i.cat))], "Categories");
-    populateSingleDropdown("class", [...new Set(catalogData.map(i => i.cls))], "Classes");
-    populateSingleDropdown("subclass", [...new Set(catalogData.map(i => i.sub))], "Sub Classes");
-    populateSingleDropdown("brand", [...new Set(catalogData.map(i => i.brand))], "Brands");
 }
 
 function populateSingleDropdown(id, list, label) {
@@ -377,6 +376,14 @@ function populateSingleDropdown(id, list, label) {
         let opt = document.createElement("option"); opt.value = v; opt.innerText = v;
         if(v === currentVal) opt.selected = true; select.appendChild(opt);
     });
+}
+
+// SEARCH TAB DROPDOWN LOGIC
+function populateAllDropdownsInitial() {
+    populateSingleDropdown("category", [...new Set(catalogData.map(i => i.cat))], "Categories");
+    populateSingleDropdown("class", [...new Set(catalogData.map(i => i.cls))], "Classes");
+    populateSingleDropdown("subclass", [...new Set(catalogData.map(i => i.sub))], "Sub Classes");
+    populateSingleDropdown("brand", [...new Set(catalogData.map(i => i.brand))], "Brands");
 }
 
 function handleDropdownChange() {
@@ -487,33 +494,66 @@ function exportFolderToCSV() {
 }
 
 // ----------------------------------------------------
-// ADMIN PANEL FUNCTIONS
+// ADMIN PANEL FUNCTIONS (NEW DEPENDENT DROPDOWNS)
 // ----------------------------------------------------
+
+function populateAllAdminDropdownsInitial() {
+    populateSingleDropdown("newCat", [...new Set(catalogData.map(i => i.cat))], "Category");
+    populateSingleDropdown("newClass", [...new Set(catalogData.map(i => i.cls))], "Class");
+    populateSingleDropdown("newSubClass", [...new Set(catalogData.map(i => i.sub))], "Sub Class");
+    populateSingleDropdown("newBrand", [...new Set(catalogData.map(i => i.brand))], "Brand");
+}
+
+function handleAdminDropdownChange() {
+    let catVal = document.getElementById("newCat").value;
+    let clsVal = document.getElementById("newClass").value;
+    let subVal = document.getElementById("newSubClass").value;
+    let brdVal = document.getElementById("newBrand").value;
+    
+    let matches = catalogData;
+    
+    if(catVal) matches = matches.filter(i => i.cat === catVal);
+    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
+    if(subVal) matches = matches.filter(i => i.sub === subVal);
+    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
+    
+    // Dropdowns ah fresh ah katturathu
+    if(!catVal) populateSingleDropdown("newCat", [...new Set(matches.map(i => i.cat))], "Category");
+    if(!clsVal) populateSingleDropdown("newClass", [...new Set(matches.map(i => i.cls))], "Class");
+    if(!subVal) populateSingleDropdown("newSubClass", [...new Set(matches.map(i => i.sub))], "Sub Class");
+    if(!brdVal) populateSingleDropdown("newBrand", [...new Set(matches.map(i => i.brand))], "Brand");
+}
+
+function resetAdminDropdowns() {
+    document.getElementById("newCat").value = "";
+    document.getElementById("newClass").value = "";
+    document.getElementById("newSubClass").value = "";
+    document.getElementById("newBrand").value = "";
+    populateAllAdminDropdownsInitial();
+}
 
 function addSingleProductManual() {
     let id = document.getElementById("newOfferId").value.trim();
     let name = document.getElementById("newProdName").value.trim();
-    let cat = document.getElementById("newCat").value.trim() || "-";
-    let cls = document.getElementById("newClass").value.trim() || "-";
-    let sub = document.getElementById("newSubClass").value.trim() || "-";
-    let brand = document.getElementById("newBrand").value.trim() || "-";
+    let cat = document.getElementById("newCat").value;
+    let cls = document.getElementById("newClass").value;
+    let sub = document.getElementById("newSubClass").value;
+    let brand = document.getElementById("newBrand").value;
 
-    if(!id || !name) {
-        alert("Offer ID and Product Name are mandatory!"); 
+    if(!id || !name || !cat || !cls || !sub || !brand) {
+        alert("Ella fields-yum (Category, Class, Sub Class, Brand, Offer ID, Name) select/enter pannanum!"); 
         return;
     }
 
     catalogData.push({ id, cat, cls, sub, brand, name });
     
     updateStockCounterDisplay();
-    populateAllDropdownsInitial();
+    populateAllDropdownsInitial(); // Update Search Dropdowns
+    populateAllAdminDropdownsInitial(); // Update Admin Dropdowns
     
     document.getElementById("newOfferId").value = "";
     document.getElementById("newProdName").value = "";
-    document.getElementById("newCat").value = "";
-    document.getElementById("newClass").value = "";
-    document.getElementById("newSubClass").value = "";
-    document.getElementById("newBrand").value = "";
+    resetAdminDropdowns();
     
     showToast("Product Added Successfully! ✅");
 }
