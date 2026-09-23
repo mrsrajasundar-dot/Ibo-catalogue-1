@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IBO Smart Catalog</title>
+    <!-- Barcode / QR Scanner CDN Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
@@ -35,12 +37,13 @@
         select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; color: #1e293b; transition: border 0.2s; }
         select:focus, input:focus { border-color: #334155; box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1); }
         
-        .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 18px; text-transform: uppercase; }
+        .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 14px; text-transform: uppercase; }
         .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; transition: background 0.2s; }
         .btn-primary:active { background: #1e293b; }
         
         .filter-row-search { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
-        .btn-search-trigger { padding: 12px 18px; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn-search-trigger { padding: 12px 16px; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn-scan-trigger { padding: 12px 16px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
         .btn-success { width: 100%; padding: 13px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
         .result-section { margin-top: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
@@ -55,7 +58,7 @@
         .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 10px; background: #16a34a; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(22, 163, 74, 0.2); letter-spacing: 0.3px; }
         .btn-download-server { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
         
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .admin-section { background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 12px; margin-top: 10px; }
         
         .format-reference-box { background: #fffdf5; border: 1px dashed #eab308; padding: 12px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; color: #854d0e; line-height: 1.5; }
@@ -73,6 +76,23 @@
         .contact-name { font-size: 24px; font-weight: 800; color: #334155; margin: 10px 0 8px 0; }
         .contact-phone { font-size: 18px; font-weight: bold; text-decoration: none; display: inline-block; background: #f1f5f9; color: #334155; padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; }
         .lock-screen { text-align: center; padding: 35px 15px; }
+
+        /* Scanner Modal Styles */
+        .scanner-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.85); z-index: 99999; justify-content: center; 
+            align-items: center; flex-direction: column; padding: 15px; box-sizing: border-box;
+        }
+        .scanner-card {
+            background: #ffffff; border-radius: 16px; width: 100%; max-width: 380px; 
+            overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); text-align: center;
+        }
+        .scanner-header {
+            background: #b91c1c; color: #ffffff; padding: 14px 18px; font-weight: bold; 
+            font-size: 16px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .scanner-body { padding: 15px; }
+        #qr-reader { width: 100%; border-radius: 10px; overflow: hidden; background: #000; }
     </style>
 </head>
 <body>
@@ -104,6 +124,11 @@
     <!-- TAB 1: SEARCH ENGINE -->
     <div id="search-tab" class="tab-content active">
         <div id="filterFieldsForm">
+            <!-- QUICK SCAN BUTTON -->
+            <button type="button" class="btn-primary" style="background:#0284c7; margin-top:0; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="openScanner()">
+                📷 Instant Barcode / QR Scan
+            </button>
+
             <button class="btn-clear-all" onclick="resetEverythingMaster()">🔄 Reset All Filters & Fields</button>
 
             <div class="form-group"><label>Category</label><select id="category" onchange="handleDropdownChange()"><option value="">-- All Categories --</option></select></div>
@@ -118,7 +143,8 @@
                     <label style="color:#334155; font-size:14px; font-weight:bold;">🎯 Smart Search Current List</label>
                     <div class="filter-row-search">
                         <input type="text" id="masterSearchInput" placeholder="Type words (e.g., 90m FR 1.5)...">
-                        <button class="btn-search-trigger" onclick="handleMasterSearch()">🔍</button>
+                        <button class="btn-search-trigger" onclick="handleMasterSearch()" title="Search">🔍</button>
+                        <button class="btn-scan-trigger" onclick="openScanner()" title="Scan Barcode">📷</button>
                     </div>
                 </div>
                 <div style="font-weight:bold; color:#334155; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
@@ -213,10 +239,27 @@
     </div>
 </div>
 
+<!-- BARCODE / QR SCANNER MODAL -->
+<div id="scannerModal" class="scanner-modal">
+    <div class="scanner-card">
+        <div class="scanner-header">
+            <span>📷 Scan Barcode / QR</span>
+            <span onclick="closeScanner()" style="cursor:pointer; font-size:22px; line-height:1;">&times;</span>
+        </div>
+        <div class="scanner-body">
+            <div id="qr-reader"></div>
+            <p style="font-size:12px; color:#64748b; margin:12px 0 0 0;">Camera-வை பார்-கோடு அல்லது QR Code-க்கு நேராக காட்டவும்.</p>
+        </div>
+        <div style="padding:0 15px 15px;">
+            <button type="button" onclick="closeScanner()" style="width:100%; padding:10px; background:#ef4444; color:white; border:none; border-radius:8px; font-weight:bold; font-size:13px; cursor:pointer;">Close Camera</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toastBox">Copied!</div>
 
 <script>
-let catalogData = [];
+let catalogData = JSON.parse(localStorage.getItem('iboCatalogData')) || [];
 let activeFilteredMatches = [];
 
 // LOCAL STORAGE LOGIC FOR PERSISTENT FOLDERS
@@ -227,428 +270,7 @@ let activeFolder = localStorage.getItem('iboActiveFolder') || "Main List";
 if(!folders[activeFolder]) activeFolder = Object.keys(folders)[0];
 
 const ADMIN_PASSWORD = "raja123";
+let html5QrCodeScanner = null;
 
 function saveFolderDataLocally() {
-    localStorage.setItem('iboFolders', JSON.stringify(folders));
-    localStorage.setItem('iboActiveFolder', activeFolder);
-}
-
-// SPLASH SCREEN
-function triggerSplashScreen() {
-    let splash = document.getElementById("appSplashScreen");
-    splash.style.display = "flex"; splash.style.opacity = "1";
-    setTimeout(() => {
-        splash.style.opacity = "0";
-        setTimeout(() => { splash.style.display = "none"; }, 400);
-    }, 2000); 
-}
-
-// FOLDER MANAGEMENT UI
-function updateFolderUI() {
-    let select = document.getElementById("activeFolderSelect");
-    select.innerHTML = "";
-    for (let folderName in folders) {
-        let opt = document.createElement("option");
-        opt.value = folderName; opt.innerText = folderName;
-        if (folderName === activeFolder) opt.selected = true;
-        select.appendChild(opt);
-    }
-    
-    let currentCart = folders[activeFolder];
-    document.getElementById("cartCountBadge").innerText = currentCart.length;
-    document.getElementById("folderTabTitle").innerText = `📂 Items in '${activeFolder}'`;
-    
-    let container = document.getElementById("cartItemsContainer");
-    let btnExcel = document.getElementById("btnExportExcel"); 
-    container.innerHTML = "";
-    
-    if(currentCart.length === 0) { 
-        container.innerHTML = `<p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>'${activeFolder}' folder is empty.</p>`; 
-        btnExcel.style.display = "none"; 
-        return; 
-    }
-    
-    currentCart.forEach((item, index) => {
-        container.innerHTML += `
-            <div style="display:flex; justify-content:between; align-items:center; padding:8px 0; border-bottom:1px solid #e2e8f0; font-size:13px;">
-                <div style="max-width:70%;"><strong>${item.id}</strong> - ${item.name}</div>
-                <div style="margin-left:auto;">
-                    <span style="background:#e2e8f0; color:#334155; padding:3px 8px; border-radius:4px; font-weight:bold;">Qty: ${item.qty}</span>
-                    <span style="color:#ef4444; font-weight:bold; margin-left:10px; cursor:pointer;" onclick="removeFromFolder(${index})">❌</span>
-                </div>
-            </div>`;
-    });
-    btnExcel.style.display = "block";
-}
-
-function createNewFolder() {
-    let name = prompt("Enter new folder name (e.g., Raja, Shop 2):");
-    if(name && name.trim() !== "") {
-        name = name.trim();
-        if(folders[name]) {
-            alert("Intha name-la already folder irukku!"); return;
-        }
-        folders[name] = [];
-        activeFolder = name;
-        saveFolderDataLocally();
-        updateFolderUI();
-        showToast(`Folder '${name}' Created! 📁`);
-    }
-}
-
-function changeActiveFolder() {
-    activeFolder = document.getElementById("activeFolderSelect").value;
-    saveFolderDataLocally();
-    updateFolderUI();
-    showToast(`Switched to '${activeFolder}' 📂`);
-}
-
-function clearCurrentFolder() {
-    folders[activeFolder] = [];
-    saveFolderDataLocally();
-    updateFolderUI();
-    showToast(`'${activeFolder}' Cleared! 🧹`);
-}
-
-function deleteCurrentFolder() {
-    let folderKeys = Object.keys(folders);
-    if(folderKeys.length <= 1) {
-        alert("Entha folder-yum delete panna mudiyathu, at least 1 folder irukkanum!"); return;
-    }
-    if(confirm(`Are you sure you want to delete the folder '${activeFolder}'?`)) {
-        delete folders[activeFolder];
-        activeFolder = Object.keys(folders)[0]; 
-        saveFolderDataLocally();
-        updateFolderUI();
-        showToast("Folder Deleted! 🗑️");
-    }
-}
-
-// MAIN DATA LOGIC
-function loadCentralCSV() {
-    fetch('IBO STOCK-1.csv')
-    .then(response => { if (!response.ok) throw new Error(); return response.text(); })
-    .then(text => parseCSVTextData(text, false))
-    .catch(() => { updateStockCounterDisplay(); });
-}
-
-function parseCSVTextData(text, isAppendMode) {
-    let lines = text.split(/\r?\n/);
-    let headerIndex = -1;
-    for(let i = 0; i < Math.min(lines.length, 10); i++) {
-        if(lines[i].toLowerCase().includes("offerid") || lines[i].toLowerCase().includes("category")) { headerIndex = i; break; }
-    }
-    let startIndex = headerIndex !== -1 ? headerIndex + 1 : 1;
-    let tempArray = [];
-    
-    for(let i = startIndex; i < lines.length; i++) {
-        let line = lines[i].trim(); if(!line) continue;
-        let columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        if(columns.length >= 6) {
-            let id = columns[0].replace(/^"|"$/g, '').trim();
-            let cat = columns[1].replace(/^"|"$/g, '').trim();
-            let cls = columns[2].replace(/^"|"$/g, '').trim();
-            let sub = columns[3].replace(/^"|"$/g, '').trim();
-            let brand = columns[4].replace(/^"|"$/g, '').trim();
-            let name = columns[5].replace(/^"|"$/g, '').trim();
-            if(id.toLowerCase().includes("ibo") || id.toLowerCase().includes("offer") || (!id && !name && !cat)) continue;
-            tempArray.push({ id, cat, cls, sub, brand, name });
-        }
-    }
-    if(isAppendMode) { catalogData = catalogData.concat(tempArray); } 
-    else { catalogData = tempArray; }
-    
-    updateStockCounterDisplay(); 
-    populateAllDropdownsInitial(); 
-    populateAllAdminDropdownsInitial(); // Populate Admin Dropdowns too!
-}
-
-function updateStockCounterDisplay() {
-    let counter = document.getElementById("totalItemsCounter");
-    if(counter) counter.innerText = `🟢 Total Available Stock Items: ${catalogData.length}`;
-}
-
-function populateSingleDropdown(id, list, label) {
-    let select = document.getElementById(id); if(!select) return;
-    let currentVal = select.value;
-    select.innerHTML = `<option value="">-- Select ${label} --</option>`;
-    list.filter(Boolean).sort().forEach(v => {
-        let opt = document.createElement("option"); opt.value = v; opt.innerText = v;
-        if(v === currentVal) opt.selected = true; select.appendChild(opt);
-    });
-}
-
-// SEARCH TAB DROPDOWN LOGIC
-function populateAllDropdownsInitial() {
-    populateSingleDropdown("category", [...new Set(catalogData.map(i => i.cat))], "Categories");
-    populateSingleDropdown("class", [...new Set(catalogData.map(i => i.cls))], "Classes");
-    populateSingleDropdown("subclass", [...new Set(catalogData.map(i => i.sub))], "Sub Classes");
-    populateSingleDropdown("brand", [...new Set(catalogData.map(i => i.brand))], "Brands");
-}
-
-function handleDropdownChange() {
-    let catVal = document.getElementById("category").value; let clsVal = document.getElementById("class").value;
-    let subVal = document.getElementById("subclass").value; let brdVal = document.getElementById("brand").value;
-    let matches = catalogData;
-    if(catVal) matches = matches.filter(i => i.cat === catVal);
-    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
-    if(subVal) matches = matches.filter(i => i.sub === subVal);
-    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    if(!catVal) populateSingleDropdown("category", [...new Set(matches.map(i => i.cat))], "Categories");
-    if(!clsVal) populateSingleDropdown("class", [...new Set(matches.map(i => i.cls))], "Classes");
-    if(!subVal) populateSingleDropdown("subclass", [...new Set(matches.map(i => i.sub))], "Sub Classes");
-    if(!brdVal) populateSingleDropdown("brand", [...new Set(matches.map(i => i.brand))], "Brands");
-}
-
-function resetEverythingMaster() {
-    document.getElementById("category").value = ""; document.getElementById("class").value = "";
-    document.getElementById("subclass").value = ""; document.getElementById("brand").value = "";
-    document.getElementById("masterSearchInput").value = "";
-    populateAllDropdownsInitial(); activeFilteredMatches = [];
-    document.getElementById("resultSection").style.display = "none";
-}
-
-function triggerFilterSubmit() {
-    document.getElementById("masterSearchInput").value = "";
-    let catVal = document.getElementById("category").value; let clsVal = document.getElementById("class").value;
-    let subVal = document.getElementById("subclass").value; let brdVal = document.getElementById("brand").value;
-    let matches = catalogData;
-    if(catVal) matches = matches.filter(i => i.cat === catVal);
-    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
-    if(subVal) matches = matches.filter(i => i.sub === subVal);
-    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    activeFilteredMatches = matches;
-    document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${matches.length}`;
-    renderCatalogCards(activeFilteredMatches.slice(0, 100));
-    document.getElementById("resultSection").style.display = "block";
-}
-
-function handleMasterSearch() {
-    let rawQuery = document.getElementById("masterSearchInput").value.toLowerCase().trim();
-    let currentPool = activeFilteredMatches.length > 0 ? activeFilteredMatches : catalogData;
-    if(!rawQuery) {
-        renderCatalogCards(currentPool.slice(0, 100)); document.getElementById("resultCountLabel").innerText = `🎯 Results Found: ${currentPool.length}`; return;
-    }
-    let searchTerms = rawQuery.split(/\s+/);
-    let textFiltered = currentPool.filter(item => {
-        let targetText = (item.id + " " + item.name + " " + item.brand).toLowerCase();
-        return searchTerms.every(term => targetText.includes(term));
-    });
-    document.getElementById("resultCountLabel").innerText = `🎯 Filtered Matches: ${textFiltered.length}`;
-    renderCatalogCards(textFiltered.slice(0, 100));
-}
-
-function renderCatalogCards(dataList) {
-    let container = document.getElementById("multipleResultsContainer"); container.innerHTML = "";
-    if(dataList.length > 0) {
-        dataList.forEach((match) => {
-            container.innerHTML += `
-                <div class="product-card">
-                    <div class="copy-tile" onclick="copyTextDirect('${match.id}', 'Offer ID')">
-                        <div><span class="tile-label">Offer ID</span><br><span class="tile-value">${match.id}</span></div><div class="copy-btn">📋 Copy</div>
-                    </div>
-                    <div class="copy-tile" onclick="copyTextDirect('${match.name}', 'Product Name')">
-                        <div><span class="tile-label">Product Name</span><br><span class="tile-value">${match.name}</span></div><div class="copy-btn">📋 Copy</div>
-                    </div>
-                    <div class="cart-controls">
-                        <div><span style="font-size:12px; font-weight:600; color:#475569;">Qty:</span>
-                        <input type="number" class="qty-input" id="qty_${match.id}" value="1" min="1"></div>
-                        <button class="btn-add-cart" onclick="addToExportFolder('${match.id}')">➕ Add to Folder</button>
-                    </div>
-                </div>`;
-        });
-    } else { container.innerHTML = "<div style='text-align:center; font-size:13px; color:#64748b; padding:10px;'>No products found.</div>"; }
-}
-
-function addToExportFolder(id) {
-    let item = catalogData.find(i => i.id === id);
-    let qtyVal = parseInt(document.getElementById(`qty_${id}`).value) || 1;
-    
-    let currentCart = folders[activeFolder];
-    let existingIndex = currentCart.findIndex(i => i.id === id);
-    if(existingIndex > -1) {
-        currentCart[existingIndex].qty += qtyVal;
-    } else {
-        currentCart.push({ id: item.id, name: item.name, qty: qtyVal });
-    }
-    
-    saveFolderDataLocally();
-    updateFolderUI(); 
-    showToast(`Added to '${activeFolder}'! ✔️`);
-}
-
-function removeFromFolder(index) { 
-    folders[activeFolder].splice(index, 1); 
-    saveFolderDataLocally();
-    updateFolderUI(); 
-}
-
-function exportFolderToCSV() {
-    let currentCart = folders[activeFolder];
-    if(currentCart.length === 0) return;
-    let csvContent = "data:text/csv;charset=utf-8,Offer ID,Product Name,Quantity\n";
-    currentCart.forEach(item => { csvContent += `"${item.id}","${item.name.replace(/"/g, '""')}",${item.qty}\n`; });
-    let link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `${activeFolder}_Report.csv`); 
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
-}
-
-// ----------------------------------------------------
-// ADMIN PANEL FUNCTIONS (NEW DEPENDENT DROPDOWNS)
-// ----------------------------------------------------
-
-function populateAllAdminDropdownsInitial() {
-    populateSingleDropdown("newCat", [...new Set(catalogData.map(i => i.cat))], "Category");
-    populateSingleDropdown("newClass", [...new Set(catalogData.map(i => i.cls))], "Class");
-    populateSingleDropdown("newSubClass", [...new Set(catalogData.map(i => i.sub))], "Sub Class");
-    populateSingleDropdown("newBrand", [...new Set(catalogData.map(i => i.brand))], "Brand");
-}
-
-function handleAdminDropdownChange() {
-    let catVal = document.getElementById("newCat").value;
-    let clsVal = document.getElementById("newClass").value;
-    let subVal = document.getElementById("newSubClass").value;
-    let brdVal = document.getElementById("newBrand").value;
-    
-    let matches = catalogData;
-    
-    if(catVal) matches = matches.filter(i => i.cat === catVal);
-    if(clsVal) matches = matches.filter(i => i.cls === clsVal);
-    if(subVal) matches = matches.filter(i => i.sub === subVal);
-    if(brdVal) matches = matches.filter(i => i.brand === brdVal);
-    
-    // Dropdowns ah fresh ah katturathu
-    if(!catVal) populateSingleDropdown("newCat", [...new Set(matches.map(i => i.cat))], "Category");
-    if(!clsVal) populateSingleDropdown("newClass", [...new Set(matches.map(i => i.cls))], "Class");
-    if(!subVal) populateSingleDropdown("newSubClass", [...new Set(matches.map(i => i.sub))], "Sub Class");
-    if(!brdVal) populateSingleDropdown("newBrand", [...new Set(matches.map(i => i.brand))], "Brand");
-}
-
-function resetAdminDropdowns() {
-    document.getElementById("newCat").value = "";
-    document.getElementById("newClass").value = "";
-    document.getElementById("newSubClass").value = "";
-    document.getElementById("newBrand").value = "";
-    populateAllAdminDropdownsInitial();
-}
-
-function addSingleProductManual() {
-    let id = document.getElementById("newOfferId").value.trim();
-    let name = document.getElementById("newProdName").value.trim();
-    let cat = document.getElementById("newCat").value;
-    let cls = document.getElementById("newClass").value;
-    let sub = document.getElementById("newSubClass").value;
-    let brand = document.getElementById("newBrand").value;
-
-    if(!id || !name || !cat || !cls || !sub || !brand) {
-        alert("Ella fields-yum (Category, Class, Sub Class, Brand, Offer ID, Name) select/enter pannanum!"); 
-        return;
-    }
-
-    catalogData.push({ id, cat, cls, sub, brand, name });
-    
-    updateStockCounterDisplay();
-    populateAllDropdownsInitial(); // Update Search Dropdowns
-    populateAllAdminDropdownsInitial(); // Update Admin Dropdowns
-    
-    document.getElementById("newOfferId").value = "";
-    document.getElementById("newProdName").value = "";
-    resetAdminDropdowns();
-    
-    showToast("Product Added Successfully! ✅");
-}
-
-function downloadSampleHeaderFormat() {
-    let csvContent = "data:text/csv;charset=utf-8,offerid,category,class,subclass,brand,name\n";
-    let link = document.createElement("a"); 
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", "Sample_Upload_Template.csv"); 
-    document.body.appendChild(link); 
-    link.click(); 
-    document.body.removeChild(link);
-}
-
-function downloadFullServerDataToExcel() {
-    if(catalogData.length === 0) { 
-        alert("No data available to download!"); 
-        return; 
-    }
-    let csvContent = "data:text/csv;charset=utf-8,offerid,category,class,subclass,brand,name\n";
-    catalogData.forEach(item => { 
-        csvContent += `"${item.id}","${item.cat}","${item.cls}","${item.sub}","${item.brand}","${item.name.replace(/"/g, '""')}"\n`; 
-    });
-    let link = document.createElement("a"); 
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `Full_Catalog_Data.csv`); 
-    document.body.appendChild(link); 
-    link.click(); 
-    document.body.removeChild(link);
-}
-
-function processBulkUpload(isReplace) {
-    let fileInput = document.getElementById("csvFileInput");
-    if(fileInput.files.length === 0) {
-        alert("Please select a CSV file first!"); 
-        return;
-    }
-    
-    let file = fileInput.files[0];
-    let reader = new FileReader();
-    
-    reader.onload = function(e) {
-        let text = e.target.result;
-        parseCSVTextData(text, !isReplace);
-        showToast(isReplace ? "Data Replaced Successfully! 💥" : "Data Appended Successfully! ➕");
-        fileInput.value = ""; 
-    };
-    
-    reader.readAsText(file);
-}
-
-function checkAdminPassword() {
-    let inputPass = document.getElementById("adminPasswordInput").value.trim();
-    if(inputPass === ADMIN_PASSWORD) {
-        document.getElementById("adminLockScreen").style.display = "none";
-        document.getElementById("adminContentPanel").style.display = "block";
-        document.getElementById("adminPasswordInput").value = "";
-        updateStockCounterDisplay(); showToast("Access Granted! 🔓");
-    } else { alert("Wrong Password! Access Denied."); }
-}
-
-function lockAdminPanel() {
-    document.getElementById("adminContentPanel").style.display = "none";
-    document.getElementById("adminLockScreen").style.display = "block";
-}
-
-// UTILS & TAB LOGIC
-function switchTab(tabId, btn) {
-    if (tabId !== 'admin-tab') lockAdminPanel();
-    
-    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).style.display = 'block';
-    if(btn) btn.classList.add('active');
-    
-    let folderPanel = document.getElementById("globalFolderPanel");
-    if(tabId === 'search-tab' || tabId === 'folder-tab') {
-        folderPanel.style.display = 'flex';
-    } else {
-        folderPanel.style.display = 'none';
-    }
-}
-function copyTextDirect(text, label) { navigator.clipboard.writeText(text).then(() => showToast(label + " Copied! 👍")); }
-function showToast(msg) { let t = document.getElementById("toastBox"); t.innerText = msg; t.style.display = "block"; setTimeout(() => t.style.display="none", 2000); }
-
-window.onload = function() { 
-    loadCentralCSV(); 
-    updateFolderUI(); 
-    
-    // Check session storage so it only shows once per browser tab session
-    if(!sessionStorage.getItem('iboSplashShown')) {
-        triggerSplashScreen(); 
-        sessionStorage.setItem('iboSplashShown', 'true');
-    }
-};
-</script>
-</body>
-</html>
+    localStorage.setI
