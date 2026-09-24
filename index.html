@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IBO Smart Catalog</title>
-    <!-- Barcode / QR Scanner CDN Library -->
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
@@ -37,13 +35,12 @@
         select, input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #fff; color: #1e293b; transition: border 0.2s; }
         select:focus, input:focus { border-color: #334155; box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1); }
         
-        .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 14px; text-transform: uppercase; }
+        .btn-clear-all { width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 18px; text-transform: uppercase; }
         .btn-primary { width: 100%; padding: 13px; background: #334155; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 15px; transition: background 0.2s; }
         .btn-primary:active { background: #1e293b; }
         
         .filter-row-search { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
-        .btn-search-trigger { padding: 12px 16px; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .btn-scan-trigger { padding: 12px 16px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn-search-trigger { padding: 12px 18px; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
         .btn-success { width: 100%; padding: 13px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
         .result-section { margin-top: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
@@ -58,7 +55,7 @@
         .data-counter { text-align: center; font-size: 14px; color: #ffffff; font-weight: bold; margin-bottom: 10px; background: #16a34a; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(22, 163, 74, 0.2); letter-spacing: 0.3px; }
         .btn-download-server { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
         
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .admin-section { background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 12px; margin-top: 10px; }
         
         .format-reference-box { background: #fffdf5; border: 1px dashed #eab308; padding: 12px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; color: #854d0e; line-height: 1.5; }
@@ -76,23 +73,6 @@
         .contact-name { font-size: 24px; font-weight: 800; color: #334155; margin: 10px 0 8px 0; }
         .contact-phone { font-size: 18px; font-weight: bold; text-decoration: none; display: inline-block; background: #f1f5f9; color: #334155; padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; }
         .lock-screen { text-align: center; padding: 35px 15px; }
-
-        /* Scanner Modal Styles */
-        .scanner-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.85); z-index: 99999; justify-content: center; 
-            align-items: center; flex-direction: column; padding: 15px; box-sizing: border-box;
-        }
-        .scanner-card {
-            background: #ffffff; border-radius: 16px; width: 100%; max-width: 380px; 
-            overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); text-align: center;
-        }
-        .scanner-header {
-            background: #b91c1c; color: #ffffff; padding: 14px 18px; font-weight: bold; 
-            font-size: 16px; display: flex; justify-content: space-between; align-items: center;
-        }
-        .scanner-body { padding: 15px; }
-        #qr-reader { width: 100%; border-radius: 10px; overflow: hidden; background: #000; }
     </style>
 </head>
 <body>
@@ -124,11 +104,6 @@
     <!-- TAB 1: SEARCH ENGINE -->
     <div id="search-tab" class="tab-content active">
         <div id="filterFieldsForm">
-            <!-- QUICK SCAN BUTTON -->
-            <button type="button" class="btn-primary" style="background:#0284c7; margin-top:0; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="openScanner()">
-                📷 Instant Barcode / QR Scan
-            </button>
-
             <button class="btn-clear-all" onclick="resetEverythingMaster()">🔄 Reset All Filters & Fields</button>
 
             <div class="form-group"><label>Category</label><select id="category" onchange="handleDropdownChange()"><option value="">-- All Categories --</option></select></div>
@@ -143,8 +118,7 @@
                     <label style="color:#334155; font-size:14px; font-weight:bold;">🎯 Smart Search Current List</label>
                     <div class="filter-row-search">
                         <input type="text" id="masterSearchInput" placeholder="Type words (e.g., 90m FR 1.5)...">
-                        <button class="btn-search-trigger" onclick="handleMasterSearch()" title="Search">🔍</button>
-                        <button class="btn-scan-trigger" onclick="openScanner()" title="Scan Barcode">📷</button>
+                        <button class="btn-search-trigger" onclick="handleMasterSearch()">🔍</button>
                     </div>
                 </div>
                 <div style="font-weight:bold; color:#334155; margin-bottom:12px;" id="resultCountLabel">🎯 Results Found:</div>
@@ -239,27 +213,10 @@
     </div>
 </div>
 
-<!-- BARCODE / QR SCANNER MODAL -->
-<div id="scannerModal" class="scanner-modal">
-    <div class="scanner-card">
-        <div class="scanner-header">
-            <span>📷 Scan Barcode / QR</span>
-            <span onclick="closeScanner()" style="cursor:pointer; font-size:22px; line-height:1;">&times;</span>
-        </div>
-        <div class="scanner-body">
-            <div id="qr-reader"></div>
-            <p style="font-size:12px; color:#64748b; margin:12px 0 0 0;">Camera-வை பார்-கோடு அல்லது QR Code-க்கு நேராக காட்டவும்.</p>
-        </div>
-        <div style="padding:0 15px 15px;">
-            <button type="button" onclick="closeScanner()" style="width:100%; padding:10px; background:#ef4444; color:white; border:none; border-radius:8px; font-weight:bold; font-size:13px; cursor:pointer;">Close Camera</button>
-        </div>
-    </div>
-</div>
-
 <div class="toast" id="toastBox">Copied!</div>
 
 <script>
-let catalogData = JSON.parse(localStorage.getItem('iboCatalogData')) || [];
+let catalogData = [];
 let activeFilteredMatches = [];
 
 // LOCAL STORAGE LOGIC FOR PERSISTENT FOLDERS
@@ -270,7 +227,67 @@ let activeFolder = localStorage.getItem('iboActiveFolder') || "Main List";
 if(!folders[activeFolder]) activeFolder = Object.keys(folders)[0];
 
 const ADMIN_PASSWORD = "raja123";
-let html5QrCodeScanner = null;
 
 function saveFolderDataLocally() {
-    localStorage.setI
+    localStorage.setItem('iboFolders', JSON.stringify(folders));
+    localStorage.setItem('iboActiveFolder', activeFolder);
+}
+
+// SPLASH SCREEN
+function triggerSplashScreen() {
+    let splash = document.getElementById("appSplashScreen");
+    splash.style.display = "flex"; splash.style.opacity = "1";
+    setTimeout(() => {
+        splash.style.opacity = "0";
+        setTimeout(() => { splash.style.display = "none"; }, 400);
+    }, 2000); 
+}
+
+// FOLDER MANAGEMENT UI
+function updateFolderUI() {
+    let select = document.getElementById("activeFolderSelect");
+    select.innerHTML = "";
+    for (let folderName in folders) {
+        let opt = document.createElement("option");
+        opt.value = folderName; opt.innerText = folderName;
+        if (folderName === activeFolder) opt.selected = true;
+        select.appendChild(opt);
+    }
+    
+    let currentCart = folders[activeFolder];
+    document.getElementById("cartCountBadge").innerText = currentCart.length;
+    document.getElementById("folderTabTitle").innerText = `📂 Items in '${activeFolder}'`;
+    
+    let container = document.getElementById("cartItemsContainer");
+    let btnExcel = document.getElementById("btnExportExcel"); 
+    container.innerHTML = "";
+    
+    if(currentCart.length === 0) { 
+        container.innerHTML = `<p style='text-align:center; color:#94a3b8; font-size:13px; padding:20px;'>'${activeFolder}' folder is empty.</p>`; 
+        btnExcel.style.display = "none"; 
+        return; 
+    }
+    
+    currentCart.forEach((item, index) => {
+        container.innerHTML += `
+            <div style="display:flex; justify-content:between; align-items:center; padding:8px 0; border-bottom:1px solid #e2e8f0; font-size:13px;">
+                <div style="max-width:70%;"><strong>${item.id}</strong> - ${item.name}</div>
+                <div style="margin-left:auto;">
+                    <span style="background:#e2e8f0; color:#334155; padding:3px 8px; border-radius:4px; font-weight:bold;">Qty: ${item.qty}</span>
+                    <span style="color:#ef4444; font-weight:bold; margin-left:10px; cursor:pointer;" onclick="removeFromFolder(${index})">❌</span>
+                </div>
+            </div>`;
+    });
+    btnExcel.style.display = "block";
+}
+
+function createNewFolder() {
+    let name = prompt("Enter new folder name (e.g., Raja, Shop 2):");
+    if(name && name.trim() !== "") {
+        name = name.trim();
+        if(folders[name]) {
+            alert("Intha name-la already folder irukku!"); return;
+        }
+        folders[name] = [];
+        activeFolder = name;
+        saveFolderDataL
